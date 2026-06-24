@@ -5,7 +5,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\FavoriteController;
-use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Admin\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 // Redirect root to products
@@ -25,16 +25,17 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 
 // Product routes
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
-Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/products/create/new', [ProductController::class, 'create'])->name('products.create');
+    Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
     Route::post('/products', [ProductController::class, 'store'])->name('products.store');
+    Route::get('/my-products', [ProductController::class, 'myProducts'])->name('products.my');
     Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
     Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
     Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
-    Route::get('/my-products', [ProductController::class, 'myProducts'])->name('products.my');
 });
+
+Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
 
 // Chat routes
 Route::middleware('auth')->group(function () {
@@ -57,8 +58,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/products/{product}/favorite', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
 });
 
-Route::middleware('auth')->group(function () {
-    Route::get('/admin', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-    Route::get('/admin/products', [AdminController::class, 'products'])->name('admin.products.index');
-    Route::delete('/admin/products/{product}', [AdminController::class, 'destroy'])->name('admin.products.destroy');
+// Admin routes
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/products', [DashboardController::class, 'products'])->name('products');
+    Route::delete('/products/{product}', [DashboardController::class, 'deleteProduct'])->name('products.delete');
+    Route::get('/users', [DashboardController::class, 'users'])->name('users');
+    Route::delete('/users/{user}', [DashboardController::class, 'deleteUser'])->name('users.delete');
 });

@@ -46,9 +46,12 @@
                            id="price" 
                            name="price" 
                            value="{{ old('price') }}"
-                           placeholder="3000000"
+                           placeholder="Contoh: 3500000"
+                           min="1"
+                           step="1"
                            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('price') border-red-500 @enderror"
                            required>
+                    <p class="text-sm text-gray-500 mt-1">Masukkan harga dalam rupiah penuh (tidak pakai koma atau titik)</p>
                     @error('price')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                     @enderror

@@ -10,9 +10,9 @@
 <body class="bg-gray-50">
     <!-- Navbar -->
     <nav class="bg-white shadow-sm border-b">
-        <div class="container mx-auto px-4">
+        <div class="container mx-auto max-w-screen-xl px-4">
             <div class="flex justify-between items-center h-16">
-                <div class="flex items-center space-x-8">
+                <div class="flex items-center space-x-4">
                     <a href="{{ route('products.index') }}" class="text-xl font-bold text-blue-600">
                         GadgetHub
                     </a>
@@ -39,7 +39,7 @@
                     </div>
                 </div>
                 
-                <div class="flex items-center space-x-4">
+                <div class="hidden md:flex items-center space-x-4">
                     @auth
                     <a href="{{ route('products.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
                         Pasang Iklan
@@ -73,6 +73,55 @@
                         Login
                     </a>
                     <a href="{{ route('register') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                        Daftar
+                    </a>
+                    @endauth
+                </div>
+
+                <button type="button" class="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:bg-gray-100" onclick="toggleMobileMenu()" aria-expanded="false" aria-label="Toggle navigation menu">
+                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+            </div>
+
+            <div id="mobile-menu" class="hidden md:hidden border-t border-gray-200 pt-3 pb-4">
+                <div class="space-y-1 px-2">
+                    <a href="{{ route('products.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">
+                        Jelajah
+                    </a>
+                    @auth
+                    <a href="{{ route('products.my') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">
+                        Produk Saya
+                    </a>
+                    <a href="{{ route('favorites.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">
+                        Favorit
+                    </a>
+                    <a href="{{ route('chats.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">
+                        Chat
+                    </a>
+                    @if(auth()->user()->is_admin)
+                    <a href="{{ route('admin.dashboard') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">
+                        Admin
+                    </a>
+                    @endif
+                    <a href="{{ route('products.create') }}" class="block px-3 py-2 rounded-md bg-blue-600 text-white text-base font-medium hover:bg-blue-700">
+                        Pasang Iklan
+                    </a>
+                    <a href="{{ route('profile.show') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">
+                        Profil
+                    </a>
+                    <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="w-full text-left block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">
+                            Logout
+                        </button>
+                    </form>
+                    @else
+                    <a href="{{ route('login') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">
+                        Login
+                    </a>
+                    <a href="{{ route('register') }}" class="block px-3 py-2 rounded-md bg-blue-600 text-white text-base font-medium hover:bg-blue-700">
                         Daftar
                     </a>
                     @endauth
@@ -116,6 +165,10 @@
     <script>
         function toggleDropdown() {
             document.getElementById('dropdown').classList.toggle('hidden');
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
         }
 
         // Close dropdown when clicking outside

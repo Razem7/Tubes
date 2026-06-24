@@ -6,9 +6,12 @@ use App\Models\Product;
 use App\Models\ProductPhoto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class ProductController extends Controller
 {
+    use AuthorizesRequests;
+
     public function __construct()
     {
         $this->middleware('auth')->except(['index', 'show']);
@@ -75,7 +78,7 @@ class ProductController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|min:10|max:100',
             'description' => 'required|string|min:20|max:2000',
-            'price' => 'required|numeric|min:0',
+            'price' => 'required|numeric|min:1|integer',
             'location' => 'required|string|max:255',
             'brand' => 'nullable|string|max:50',
             'model' => 'nullable|string|max:100',
@@ -84,6 +87,9 @@ class ProductController extends Controller
             'payment_methods.*' => 'in:cod,rekber',
             'photos' => 'required|array|min:1|max:8',
             'photos.*' => 'image|mimes:jpeg,png,jpg|max:5120',
+        ], [
+            'price.min' => 'Harga minimal Rp 1',
+            'price.integer' => 'Harga harus angka bulat tanpa koma atau titik',
         ]);
 
         $product = Product::create([
@@ -124,7 +130,7 @@ class ProductController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|min:10|max:100',
             'description' => 'required|string|min:20|max:2000',
-            'price' => 'required|numeric|min:0',
+            'price' => 'required|numeric|min:1|integer',
             'location' => 'required|string|max:255',
             'brand' => 'nullable|string|max:50',
             'model' => 'nullable|string|max:100',
@@ -134,6 +140,9 @@ class ProductController extends Controller
             'new_photos' => 'nullable|array|max:8',
             'new_photos.*' => 'image|mimes:jpeg,png,jpg|max:5120',
             'delete_photos' => 'nullable|array',
+        ], [
+            'price.min' => 'Harga minimal Rp 1',
+            'price.integer' => 'Harga harus angka bulat tanpa koma atau titik',
         ]);
 
         $product->update([
