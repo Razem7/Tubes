@@ -81,7 +81,7 @@
     @foreach($products as $product)
     <div class="bg-white rounded-lg shadow hover:shadow-lg transition">
         <a href="{{ route('products.show', $product) }}">
-            <img src="{{ $product->photos->first() ? asset('storage/' . $product->photos->first()->photo_url) : 'https://via.placeholder.com/300x300?text=No+Image' }}" 
+            <img src="{{ $product->photos->first() && $product->photos->first()->photo_url ? asset($product->photos->first()->photo_url) : 'https://via.placeholder.com/300x300?text=No+Image' }}" 
                  alt="{{ $product->title }}"
                  class="w-full h-48 object-cover rounded-t-lg">
         </a>
@@ -102,11 +102,34 @@
                 </svg>
                 {{ $product->user->name }}
             </div>
-            <div class="mt-2">
+            <div class="mt-2 space-y-2">
                 <span class="inline-block bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded">
                     {{ ucfirst(str_replace('_', ' ', $product->condition)) }}
                 </span>
+                @if($product->category)
+                <span class="inline-block bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded">
+                    {{ $product->category->name }}
+                </span>
+                @endif
             </div>
+
+            @auth
+            <div class="mt-4">
+                <form action="{{ route('favorites.toggle', $product) }}" method="POST">
+                    @csrf
+                    <button type="submit" class="inline-flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium transition {{ !empty($product->is_favorited) ? 'border-red-500 bg-red-50 text-red-600' : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50' }}">
+                        {!! !empty($product->is_favorited) ? '❤️' : '🤍' !!}
+                        Favorit
+                    </button>
+                </form>
+            </div>
+            @else
+            <div class="mt-4">
+                <a href="{{ route('login') }}" class="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 text-sm">
+                    🤍 Login untuk favorit
+                </a>
+            </div>
+            @endauth
         </div>
     </div>
     @endforeach

@@ -8,7 +8,7 @@
         <!-- Chat Header -->
         <div class="border-b p-4">
             <div class="flex items-center space-x-4">
-                <img src="{{ $chat->product->photos->first() ? asset('storage/' . $chat->product->photos->first()->photo_url) : 'https://via.placeholder.com/80' }}" 
+                <img src="{{ $chat->product->photos->first() && $chat->product->photos->first()->photo_url ? asset($chat->product->photos->first()->photo_url) : 'https://via.placeholder.com/80' }}" 
                      alt="{{ $chat->product->title }}"
                      class="w-16 h-16 object-cover rounded">
                 <div class="flex-1">

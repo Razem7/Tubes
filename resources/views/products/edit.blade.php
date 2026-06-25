@@ -109,13 +109,14 @@
             <div class="mb-4">
                 <label class="block text-gray-700 mb-2">Metode Pembayaran *</label>
                 @php $paymentMethods = $product->getPaymentMethodsArray(); @endphp
+                @php $oldPaymentMethods = old('payment_methods', $paymentMethods); @endphp
                 <div class="space-y-2">
                     <label class="flex items-center">
-                        <input type="checkbox" name="payment_methods[]" value="cod" class="mr-2" {{ in_array('cod', $paymentMethods) ? 'checked' : '' }}>
+                        <input type="checkbox" name="payment_methods[]" value="cod" class="mr-2" {{ is_array($oldPaymentMethods) && in_array('cod', $oldPaymentMethods) ? 'checked' : '' }}>
                         <span>COD (Cash on Delivery)</span>
                     </label>
                     <label class="flex items-center">
-                        <input type="checkbox" name="payment_methods[]" value="rekber" class="mr-2" {{ in_array('rekber', $paymentMethods) ? 'checked' : '' }}>
+                        <input type="checkbox" name="payment_methods[]" value="rekber" class="mr-2" {{ is_array($oldPaymentMethods) && in_array('rekber', $oldPaymentMethods) ? 'checked' : '' }}>
                         <span>Rekening Bersama (Rekber)</span>
                     </label>
                 </div>
@@ -129,7 +130,7 @@
                 <div class="grid grid-cols-4 gap-2">
                     @foreach($product->photos as $photo)
                     <div class="relative">
-                        <img src="{{ asset('storage/' . $photo->photo_url) }}" 
+                        <img src="{{ $photo->photo_url ? asset($photo->photo_url) : 'https://via.placeholder.com/100x100?text=No+Image' }}" 
                              alt="Photo"
                              class="w-full h-20 object-cover rounded">
                         <label class="absolute top-1 right-1 bg-red-600 text-white text-xs px-2 py-1 rounded cursor-pointer">

@@ -20,9 +20,15 @@ class ProductController extends Controller
 
     public function index(Request $request)
     {
-        $query = Product::with(['user', 'photos'])
+        $query = Product::with(['user', 'photos', 'category'])
             ->where('is_sold', false)
             ->latest();
+
+        if (auth()->check()) {
+            $query->withCount(['favorites as is_favorited' => function ($q) {
+                $q->where('user_id', auth()->id());
+            }]);
+        }
 
         // Search by keyword
         if ($request->filled('search')) {
@@ -61,7 +67,7 @@ class ProductController extends Controller
             $query->where('condition', $request->condition);
         }
 
-        $products = $query->paginate(20);
+        $products = $query->paginate(20)->withQueryString();
         $categories = Category::orderBy('name')->get();
 
         return view('products.index', compact('products', 'categories'));
@@ -69,7 +75,7 @@ class ProductController extends Controller
 
     public function show(Product $product)
     {
-        $product->load(['user', 'photos']);
+        $product->load(['user', 'photos', 'category']);
         $isFavorited = auth()->check() ? $product->isFavoritedBy(auth()->id()) : false;
 
         return view('products.show', compact('product', 'isFavorited'));

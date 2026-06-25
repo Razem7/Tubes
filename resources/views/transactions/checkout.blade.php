@@ -10,7 +10,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
                 <h3 class="font-semibold mb-4">Detail Produk</h3>
-                <img src="{{ $product->photos->first() ? asset('storage/' . $product->photos->first()->photo_url) : 'https://via.placeholder.com/400x300?text=No+Image' }}" alt="{{ $product->title }}" class="w-full h-64 object-cover rounded-lg mb-4">
+                <img src="{{ $product->photos->first() && $product->photos->first()->photo_url ? asset($product->photos->first()->photo_url) : 'https://via.placeholder.com/400x300?text=No+Image' }}" alt="{{ $product->title }}" class="w-full h-64 object-cover rounded-lg mb-4">
                 <p class="font-semibold text-lg mb-2">{{ $product->title }}</p>
                 <p class="text-blue-600 text-2xl font-bold mb-4">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
                 <div class="space-y-2 text-sm text-gray-700">

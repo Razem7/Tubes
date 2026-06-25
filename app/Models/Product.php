@@ -62,6 +62,10 @@ class Product extends Model
 
     public function getPaymentMethodsArray()
     {
-        return explode(',', $this->payment_methods);
+        if (empty($this->payment_methods)) {
+            return [];
+        }
+
+        return array_filter(array_map('trim', explode(',', $this->payment_methods)));
     }
 }

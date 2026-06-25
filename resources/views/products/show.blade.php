@@ -8,16 +8,16 @@
     <div>
         @if($product->photos->count() > 0)
         <div id="mainImage" class="mb-4">
-            <img src="{{ asset('storage/' . $product->photos->first()->photo_url) }}" 
+            <img src="{{ $product->photos->first()->photo_url ? asset($product->photos->first()->photo_url) : 'https://via.placeholder.com/600x400?text=No+Image' }}" 
                  alt="{{ $product->title }}"
                  class="w-full h-96 object-cover rounded-lg">
         </div>
         <div class="grid grid-cols-4 gap-2">
             @foreach($product->photos as $photo)
-            <img src="{{ asset('storage/' . $photo->photo_url) }}" 
+            <img src="{{ $photo->photo_url ? asset($photo->photo_url) : 'https://via.placeholder.com/100x100?text=No+Image' }}" 
                  alt="{{ $product->title }}"
                  class="w-full h-20 object-cover rounded cursor-pointer hover:opacity-75"
-                 onclick="changeMainImage('{{ asset('storage/' . $photo->photo_url) }}')">
+                 onclick="changeMainImage('{{ $photo->photo_url ? asset($photo->photo_url) : 'https://via.placeholder.com/600x400?text=No+Image' }}')">
             @endforeach
         </div>
         @else
@@ -52,6 +52,12 @@
                 <div class="flex justify-between">
                     <span class="text-gray-600">Model:</span>
                     <span class="font-medium">{{ $product->model }}</span>
+                </div>
+                @endif
+                @if($product->category)
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Kategori:</span>
+                    <span class="font-medium">{{ $product->category->name }}</span>
                 </div>
                 @endif
                 <div class="flex justify-between">
@@ -91,8 +97,16 @@
             </div>
         </div>
 
+        @if($product->is_sold)
+        <div class="mb-4">
+            <span class="inline-flex items-center bg-red-100 text-red-700 px-3 py-2 rounded-full text-sm font-semibold">
+                Produk ini sudah terjual
+            </span>
+        </div>
+        @endif
+
         <!-- Action Buttons -->
-        <div class="flex gap-2">
+        <div class="flex flex-col gap-2 md:flex-row">
             @auth
                 @if($product->user_id === auth()->id())
                     <a href="{{ route('products.edit', $product) }}" class="flex-1 bg-blue-600 text-white text-center px-4 py-3 rounded-lg hover:bg-blue-700">
@@ -106,7 +120,7 @@
                         </button>
                     </form>
                 @else
-                    <a href="{{ route('products.checkout', $product) }}" class="flex-1 bg-green-600 text-white text-center px-4 py-3 rounded-lg hover:bg-green-700">
+                    <a href="{{ route('products.checkout', $product) }}" class="flex-1 bg-green-600 text-white text-center px-4 py-3 rounded-lg hover:bg-green-700 {{ $product->is_sold ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}">
                         Beli Sekarang
                     </a>
                     <form action="{{ route('chats.start', $product) }}" method="POST" class="flex-1">
@@ -117,8 +131,9 @@
                     </form>
                     <form action="{{ route('favorites.toggle', $product) }}" method="POST" id="favoriteForm">
                         @csrf
-                        <button type="submit" class="bg-gray-200 text-gray-700 px-4 py-3 rounded-lg hover:bg-gray-300">
-                            <span id="favoriteIcon">{{ $isFavorited ? '❤️' : '🤍' }}</span>
+                        <button type="submit" class="inline-flex items-center justify-center gap-2 bg-gray-200 text-gray-700 px-4 py-3 rounded-lg hover:bg-gray-300">
+                            <span>{{ $isFavorited ? '❤️' : '🤍' }}</span>
+                            <span>Favorit</span>
                         </button>
                     </form>
                 @endif

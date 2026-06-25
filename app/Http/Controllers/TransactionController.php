@@ -12,8 +12,10 @@ class TransactionController extends Controller
     public function index()
     {
         $transactions = Transaction::with(['product.photos', 'buyer', 'seller'])
-            ->where('buyer_id', auth()->id())
-            ->orWhere('seller_id', auth()->id())
+            ->where(function ($query) {
+                $query->where('buyer_id', auth()->id())
+                      ->orWhere('seller_id', auth()->id());
+            })
             ->latest()
             ->paginate(20);
 

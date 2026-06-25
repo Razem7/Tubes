@@ -12,7 +12,7 @@
         @php $product = $favorite->product; @endphp
         <div class="bg-white rounded-lg shadow hover:shadow-lg transition">
             <a href="{{ route('products.show', $product) }}">
-                <img src="{{ $product->photos->first() ? asset('storage/' . $product->photos->first()->photo_url) : 'https://via.placeholder.com/300x300?text=No+Image' }}" 
+                <img src="{{ $product->photos->first() && $product->photos->first()->photo_url ? asset($product->photos->first()->photo_url) : 'https://via.placeholder.com/300x300?text=No+Image' }}" 
                      alt="{{ $product->title }}"
                      class="w-full h-48 object-cover rounded-t-lg">
             </a>

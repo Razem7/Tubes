@@ -44,7 +44,7 @@
                     @forelse($products as $product)
                     <tr class="border-b">
                         <td class="py-3">
-                            <img src="{{ $product->photos->first() ? asset('storage/' . $product->photos->first()->photo_url) : 'https://via.placeholder.com/50' }}" 
+                            <img src="{{ $product->photos->first() && $product->photos->first()->photo_url ? asset($product->photos->first()->photo_url) : 'https://via.placeholder.com/50' }}" 
                                  alt="{{ $product->title }}"
                                  class="w-16 h-16 object-cover rounded">
                         </td>

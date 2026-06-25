@@ -15,7 +15,7 @@
         @endphp
         <a href="{{ route('chats.show', $chat) }}" class="block p-4 hover:bg-gray-50 transition">
             <div class="flex items-start space-x-4">
-                <img src="{{ $chat->product->photos->first() ? asset('storage/' . $chat->product->photos->first()->photo_url) : 'https://via.placeholder.com/80' }}" 
+                <img src="{{ $chat->product->photos->first() && $chat->product->photos->first()->photo_url ? asset($chat->product->photos->first()->photo_url) : 'https://via.placeholder.com/80' }}" 
                      alt="{{ $chat->product->title }}"
                      class="w-16 h-16 object-cover rounded">
                 <div class="flex-1 min-w-0">
