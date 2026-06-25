@@ -104,6 +104,8 @@
                 </div>
             </div>
 
+            @include('products.components.category-select')
+
             <div class="mb-4">
                 <label class="block text-gray-700 mb-2">Metode Pembayaran *</label>
                 @php $paymentMethods = $product->getPaymentMethodsArray(); @endphp

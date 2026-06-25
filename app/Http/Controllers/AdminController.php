@@ -10,7 +10,7 @@ class AdminController extends Controller
 {
     protected function authorizeAdmin(): void
     {
-        if (!auth()->check() || !auth()->user()->is_admin) {
+        if (! auth()->check() || ! auth()->user()->is_admin) {
             abort(403);
         }
     }
@@ -33,7 +33,7 @@ class AdminController extends Controller
         $query = Product::with('user')->latest();
 
         if ($request->filled('search')) {
-            $query->where('title', 'like', '%' . $request->search . '%');
+            $query->where('title', 'like', '%'.$request->search.'%');
         }
 
         if ($request->filled('status')) {
@@ -54,8 +54,8 @@ class AdminController extends Controller
         $this->authorizeAdmin();
 
         foreach ($product->photos as $photo) {
-            if (app('files')->exists(storage_path('app/public/' . $photo->photo_url))) {
-                app('files')->delete(storage_path('app/public/' . $photo->photo_url));
+            if (app('files')->exists(storage_path('app/public/'.$photo->photo_url))) {
+                app('files')->delete(storage_path('app/public/'.$photo->photo_url));
             }
             $photo->delete();
         }

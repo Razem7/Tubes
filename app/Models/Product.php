@@ -16,6 +16,7 @@ class Product extends Model
         'model',
         'condition',
         'payment_methods',
+        'category_id',
         'is_sold',
     ];
 
@@ -27,6 +28,11 @@ class Product extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 
     public function photos()

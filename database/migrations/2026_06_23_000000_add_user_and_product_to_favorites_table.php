@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('favorites', function (Blueprint $table) {
-            if (!Schema::hasColumn('favorites', 'user_id')) {
+            if (! Schema::hasColumn('favorites', 'user_id')) {
                 $table->foreignId('user_id')->after('id')->constrained()->cascadeOnDelete();
             }
-            if (!Schema::hasColumn('favorites', 'product_id')) {
+            if (! Schema::hasColumn('favorites', 'product_id')) {
                 $table->foreignId('product_id')->after('user_id')->constrained()->cascadeOnDelete();
             }
             $table->unique(['user_id', 'product_id']);

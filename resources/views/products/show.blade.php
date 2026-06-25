@@ -106,6 +106,9 @@
                         </button>
                     </form>
                 @else
+                    <a href="{{ route('products.checkout', $product) }}" class="flex-1 bg-green-600 text-white text-center px-4 py-3 rounded-lg hover:bg-green-700">
+                        Beli Sekarang
+                    </a>
                     <form action="{{ route('chats.start', $product) }}" method="POST" class="flex-1">
                         @csrf
                         <button type="submit" class="w-full bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700">

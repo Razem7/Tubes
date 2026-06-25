@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductPhoto;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class ProductController extends Controller
 {
@@ -26,9 +27,9 @@ class ProductController extends Controller
         // Search by keyword
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
@@ -50,27 +51,35 @@ class ProductController extends Controller
             $query->where('brand', $request->brand);
         }
 
+        // Filter by category
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
         // Filter by condition
         if ($request->filled('condition')) {
             $query->where('condition', $request->condition);
         }
 
         $products = $query->paginate(20);
+        $categories = Category::orderBy('name')->get();
 
-        return view('products.index', compact('products'));
+        return view('products.index', compact('products', 'categories'));
     }
 
     public function show(Product $product)
     {
         $product->load(['user', 'photos']);
         $isFavorited = auth()->check() ? $product->isFavoritedBy(auth()->id()) : false;
-        
+
         return view('products.show', compact('product', 'isFavorited'));
     }
 
     public function create()
     {
-        return view('products.create');
+        $categories = Category::orderBy('name')->get();
+
+        return view('products.create', compact('categories'));
     }
 
     public function store(Request $request)
@@ -83,6 +92,7 @@ class ProductController extends Controller
             'brand' => 'nullable|string|max:50',
             'model' => 'nullable|string|max:100',
             'condition' => 'required|in:new,like_new,good,fair',
+            'category_id' => 'required|exists:categories,id',
             'payment_methods' => 'required|array',
             'payment_methods.*' => 'in:cod,rekber',
             'photos' => 'required|array|min:1|max:8',
@@ -101,6 +111,7 @@ class ProductController extends Controller
             'brand' => $validated['brand'] ?? null,
             'model' => $validated['model'] ?? null,
             'condition' => $validated['condition'],
+            'category_id' => $validated['category_id'],
             'payment_methods' => implode(',', $validated['payment_methods']),
         ]);
 
@@ -120,7 +131,9 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         $this->authorize('update', $product);
-        return view('products.edit', compact('product'));
+        $categories = Category::orderBy('name')->get();
+
+        return view('products.edit', compact('product', 'categories'));
     }
 
     public function update(Request $request, Product $product)
@@ -135,6 +148,7 @@ class ProductController extends Controller
             'brand' => 'nullable|string|max:50',
             'model' => 'nullable|string|max:100',
             'condition' => 'required|in:new,like_new,good,fair',
+            'category_id' => 'required|exists:categories,id',
             'payment_methods' => 'required|array',
             'payment_methods.*' => 'in:cod,rekber',
             'new_photos' => 'nullable|array|max:8',
@@ -153,6 +167,7 @@ class ProductController extends Controller
             'brand' => $validated['brand'] ?? null,
             'model' => $validated['model'] ?? null,
             'condition' => $validated['condition'],
+            'category_id' => $validated['category_id'],
             'payment_methods' => implode(',', $validated['payment_methods']),
         ]);
 
@@ -161,7 +176,7 @@ class ProductController extends Controller
             $photosToDelete = ProductPhoto::whereIn('id', $request->delete_photos)
                 ->where('product_id', $product->id)
                 ->get();
-            
+
             foreach ($photosToDelete as $photo) {
                 Storage::disk('public')->delete($photo->photo_url);
                 $photo->delete();

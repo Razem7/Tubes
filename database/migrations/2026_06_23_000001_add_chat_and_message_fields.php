@@ -12,28 +12,28 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('chats', function (Blueprint $table) {
-            if (!Schema::hasColumn('chats', 'product_id')) {
+            if (! Schema::hasColumn('chats', 'product_id')) {
                 $table->foreignId('product_id')->after('id')->constrained()->cascadeOnDelete();
             }
-            if (!Schema::hasColumn('chats', 'buyer_id')) {
+            if (! Schema::hasColumn('chats', 'buyer_id')) {
                 $table->foreignId('buyer_id')->after('product_id')->constrained('users')->cascadeOnDelete();
             }
-            if (!Schema::hasColumn('chats', 'seller_id')) {
+            if (! Schema::hasColumn('chats', 'seller_id')) {
                 $table->foreignId('seller_id')->after('buyer_id')->constrained('users')->cascadeOnDelete();
             }
         });
 
         Schema::table('messages', function (Blueprint $table) {
-            if (!Schema::hasColumn('messages', 'chat_id')) {
+            if (! Schema::hasColumn('messages', 'chat_id')) {
                 $table->foreignId('chat_id')->after('id')->constrained()->cascadeOnDelete();
             }
-            if (!Schema::hasColumn('messages', 'sender_id')) {
+            if (! Schema::hasColumn('messages', 'sender_id')) {
                 $table->foreignId('sender_id')->after('chat_id')->constrained('users')->cascadeOnDelete();
             }
-            if (!Schema::hasColumn('messages', 'message_text')) {
+            if (! Schema::hasColumn('messages', 'message_text')) {
                 $table->text('message_text')->after('sender_id');
             }
-            if (!Schema::hasColumn('messages', 'read_at')) {
+            if (! Schema::hasColumn('messages', 'read_at')) {
                 $table->timestamp('read_at')->nullable()->after('message_text');
             }
         });
