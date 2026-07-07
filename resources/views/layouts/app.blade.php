@@ -153,7 +153,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-800 text-white mt-12 py-8">
+    <footer class="bg-gray-800 text-white mt-4 py-4">
         <div class="container mx-auto px-4">
             <div class="text-center">
                 <p class="text-sm">&copy; 2024 GadgetHub. Platform jual beli HP bekas terpercaya.</p>
