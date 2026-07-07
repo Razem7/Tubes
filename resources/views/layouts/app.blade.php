@@ -157,7 +157,6 @@
         <div class="container mx-auto px-4">
             <div class="text-center">
                 <p class="text-sm">&copy; 2024 GadgetHub. Platform jual beli HP bekas terpercaya.</p>
-                <p class="text-xs text-gray-400 mt-2">Daffa Azaria & Rao Azeem Samudra - D4 Teknik Informatika</p>
             </div>
         </div>
     </footer>
