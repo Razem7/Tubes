@@ -7,7 +7,7 @@
     <title>@yield('title', 'GadgetHub - Marketplace HP Bekas')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-50 flex flex-col min-h-screen">
     <!-- Navbar -->
     <nav class="bg-white shadow-sm border-b">
         <div class="container mx-auto max-w-screen-xl px-4">
@@ -148,15 +148,15 @@
     @endif
 
     <!-- Main Content -->
-    <main class="container mx-auto px-4 py-6">
+    <main class="container mx-auto px-4 py-6 flex-1">
         @yield('content')
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-800 text-white mt-4 py-4">
+    <footer class="bg-gray-800 text-white mt-auto py-4">
         <div class="container mx-auto px-4">
             <div class="text-center">
-                <p class="text-sm">&copy; 2024 GadgetHub. Platform jual beli HP bekas terpercaya.</p>
+                <p class="text-sm text-gray-400">&copy; 2025 GadgetHub. Platform jual beli gadget bekas terpercaya.</p>
             </div>
         </div>
     </footer>

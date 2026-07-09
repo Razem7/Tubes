@@ -184,7 +184,9 @@ class ProductController extends Controller
                 ->get();
 
             foreach ($photosToDelete as $photo) {
-                Storage::disk('public')->delete($photo->photo_url);
+                if (!empty($photo->photo_url)) {
+                    Storage::disk('public')->delete($photo->photo_url);
+                }
                 $photo->delete();
             }
         }
@@ -211,7 +213,9 @@ class ProductController extends Controller
 
         // Delete all photos
         foreach ($product->photos as $photo) {
-            Storage::disk('public')->delete($photo->photo_url);
+            if (!empty($photo->photo_url)) {
+                Storage::disk('public')->delete($photo->photo_url);
+            }
             $photo->delete();
         }
 

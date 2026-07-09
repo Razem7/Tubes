@@ -52,7 +52,9 @@ class DashboardController extends Controller
     public function deleteProduct(Product $product)
     {
         foreach ($product->photos as $photo) {
-            \Storage::disk('public')->delete($photo->photo_url);
+            if (!empty($photo->photo_url)) {
+                \Storage::disk('public')->delete($photo->photo_url);
+            }
             $photo->delete();
         }
 
@@ -87,7 +89,9 @@ class DashboardController extends Controller
         // Delete user's products
         foreach ($user->products as $product) {
             foreach ($product->photos as $photo) {
-                \Storage::disk('public')->delete($photo->photo_url);
+                if (!empty($photo->photo_url)) {
+                    \Storage::disk('public')->delete($photo->photo_url);
+                }
                 $photo->delete();
             }
             $product->delete();

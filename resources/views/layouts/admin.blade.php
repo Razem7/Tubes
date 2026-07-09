@@ -7,7 +7,7 @@
     <title>@yield('title', 'Admin - GadgetHub')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-100 flex flex-col min-h-screen">
     <!-- Top Navbar -->
     <nav class="bg-white shadow-sm border-b">
         <div class="container mx-auto px-4">
@@ -43,7 +43,7 @@
         </div>
     </nav>
 
-    <div class="flex">
+    <div class="flex flex-1">
         <!-- Sidebar -->
         <aside class="w-64 bg-white min-h-screen shadow-sm">
             <div class="p-4">
@@ -90,6 +90,15 @@
             @yield('content')
         </main>
     </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-4 mt-auto">
+        <div class="container mx-auto px-4">
+            <div class="text-center">
+                <p class="text-sm text-gray-400">&copy; 2025 GadgetHub. Platform jual beli gadget bekas terpercaya.</p>
+            </div>
+        </div>
+    </footer>
 
     <script>
         function toggleDropdown() {
