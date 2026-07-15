@@ -27,7 +27,8 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 // Product routes
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 
-Route::middleware('auth')->group(function () {
+// Routes khusus user biasa (admin diblokir)
+Route::middleware(['auth', 'not_admin'])->group(function () {
     Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
     Route::post('/products', [ProductController::class, 'store'])->name('products.store');
     Route::get('/my-products', [ProductController::class, 'myProducts'])->name('products.my');
@@ -43,23 +44,23 @@ Route::middleware('auth')->group(function () {
 
 Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
 
-// Chat routes
-Route::middleware('auth')->group(function () {
+// Chat routes (khusus user biasa)
+Route::middleware(['auth', 'not_admin'])->group(function () {
     Route::get('/chats', [ChatController::class, 'index'])->name('chats.index');
     Route::get('/chats/{chat}', [ChatController::class, 'show'])->name('chats.show');
     Route::post('/products/{product}/chat', [ChatController::class, 'startChat'])->name('chats.start');
     Route::post('/chats/{chat}/messages', [ChatController::class, 'sendMessage'])->name('chats.send');
 });
 
-// Profile routes
+// Profile routes (semua user termasuk admin boleh akses)
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
 
-// Favorite routes
-Route::middleware('auth')->group(function () {
+// Favorite routes (khusus user biasa)
+Route::middleware(['auth', 'not_admin'])->group(function () {
     Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
     Route::post('/products/{product}/favorite', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
 });

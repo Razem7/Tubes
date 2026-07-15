@@ -94,8 +94,10 @@
     <!-- Footer -->
     <footer class="bg-gray-800 text-white py-4 mt-auto">
         <div class="container mx-auto px-4">
-            <div class="text-center">
-                <p class="text-sm text-gray-400">&copy; 2025 GadgetHub. Platform jual beli gadget bekas terpercaya.</p>
+            <div class="flex flex-col md:flex-row justify-between items-center gap-2">
+                <p class="text-sm font-semibold text-red-400">Admin Panel — GadgetHub</p>
+                <p class="text-xs text-gray-400">&copy; {{ date('Y') }} GadgetHub. Platform jual beli gadget bekas terpercaya.</p>
+                <p class="text-xs text-gray-400">D4 Teknik Informatika</p>
             </div>
         </div>
     </footer>

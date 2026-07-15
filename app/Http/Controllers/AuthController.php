@@ -51,6 +51,11 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
 
+            // Admin langsung diarahkan ke dashboard admin
+            if (Auth::user()->is_admin) {
+                return redirect()->route('admin.dashboard')->with('success', 'Selamat datang, Admin!');
+            }
+
             return redirect()->intended(route('products.index'))->with('success', 'Selamat datang kembali!');
         }
 

@@ -107,25 +107,6 @@
             @include('products.components.category-select')
 
             <div class="mb-4">
-                <label class="block text-gray-700 mb-2">Metode Pembayaran *</label>
-                @php $paymentMethods = $product->getPaymentMethodsArray(); @endphp
-                @php $oldPaymentMethods = old('payment_methods', $paymentMethods); @endphp
-                <div class="space-y-2">
-                    <label class="flex items-center">
-                        <input type="checkbox" name="payment_methods[]" value="cod" class="mr-2" {{ is_array($oldPaymentMethods) && in_array('cod', $oldPaymentMethods) ? 'checked' : '' }}>
-                        <span>COD (Cash on Delivery)</span>
-                    </label>
-                    <label class="flex items-center">
-                        <input type="checkbox" name="payment_methods[]" value="rekber" class="mr-2" {{ is_array($oldPaymentMethods) && in_array('rekber', $oldPaymentMethods) ? 'checked' : '' }}>
-                        <span>Rekening Bersama (Rekber)</span>
-                    </label>
-                </div>
-                @error('payment_methods')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                @enderror
-            </div>
-
-            <div class="mb-4">
                 <label class="block text-gray-700 mb-2">Foto Saat Ini</label>
                 <div class="grid grid-cols-4 gap-2">
                     @foreach($product->photos as $photo)

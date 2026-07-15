@@ -99,8 +99,6 @@ class ProductController extends Controller
             'model' => 'nullable|string|max:100',
             'condition' => 'required|in:new,like_new,good,fair',
             'category_id' => 'required|exists:categories,id',
-            'payment_methods' => 'required|array',
-            'payment_methods.*' => 'in:cod,rekber',
             'photos' => 'required|array|min:1|max:8',
             'photos.*' => 'image|mimes:jpeg,png,jpg|max:5120',
         ], [
@@ -118,7 +116,7 @@ class ProductController extends Controller
             'model' => $validated['model'] ?? null,
             'condition' => $validated['condition'],
             'category_id' => $validated['category_id'],
-            'payment_methods' => implode(',', $validated['payment_methods']),
+            'payment_methods' => 'cod,rekber',
         ]);
 
         // Upload photos
@@ -155,8 +153,6 @@ class ProductController extends Controller
             'model' => 'nullable|string|max:100',
             'condition' => 'required|in:new,like_new,good,fair',
             'category_id' => 'required|exists:categories,id',
-            'payment_methods' => 'required|array',
-            'payment_methods.*' => 'in:cod,rekber',
             'new_photos' => 'nullable|array|max:8',
             'new_photos.*' => 'image|mimes:jpeg,png,jpg|max:5120',
             'delete_photos' => 'nullable|array',
@@ -174,7 +170,6 @@ class ProductController extends Controller
             'model' => $validated['model'] ?? null,
             'condition' => $validated['condition'],
             'category_id' => $validated['category_id'],
-            'payment_methods' => implode(',', $validated['payment_methods']),
         ]);
 
         // Delete selected photos

@@ -1,147 +1,233 @@
 @extends('layouts.app')
 
-@section('title', 'Jelajah Produk - GadgetHub')
+@section('title', 'GadgetHub - Marketplace Gadget Bekas')
 
 @section('content')
-<div class="mb-6">
-    <h1 class="text-3xl font-bold mb-4">Jelajah HP Bekas</h1>
-    
-    <!-- Search & Filter Form -->
-    <form action="{{ route('products.index') }}" method="GET" class="bg-white rounded-lg shadow p-4 mb-6">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-                <input type="text" 
-                       name="search" 
-                       value="{{ request('search') }}"
-                       placeholder="Cari HP..."
-                       class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-            <div>
-                <input type="text" 
-                       name="location" 
-                       value="{{ request('location') }}"
-                       placeholder="Lokasi..."
-                       class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-            <div>
-                <input type="number" 
-                       name="min_price" 
-                       value="{{ request('min_price') }}"
-                       placeholder="Harga Min"
-                       class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-            <div>
-                <input type="number" 
-                       name="max_price" 
-                       value="{{ request('max_price') }}"
-                       placeholder="Harga Max"
-                       class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
+
+{{-- Hero --}}
+<div class="py-8 px-4" style="background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 60%, #3b82f6 100%);">
+    <div class="max-w-screen-xl mx-auto text-center">
+        <h1 class="text-xl md:text-2xl font-bold text-white mb-1">Temukan Barang Elektronik Bekas Terbaik</h1>
+        <p class="text-blue-100 text-sm">Transaksi aman, harga terjangkau, pilihan terlengkap.</p>
+    </div>
+</div>
+
+{{-- Category Chips --}}
+<div class="bg-white border-b border-gray-200 sticky top-16 z-40">
+    <div class="max-w-screen-xl mx-auto px-4">
+        <div class="flex items-center gap-2 overflow-x-auto py-3" style="scrollbar-width:none; -ms-overflow-style:none;">
+            <a href="{{ route('products.index', request()->except('category_id','page')) }}"
+               class="flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium border transition-all
+                      {{ !request('category_id') ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-white text-gray-600 border-gray-300 hover:border-blue-400 hover:text-blue-600' }}">
+                Semua
+            </a>
+            @foreach($categories as $cat)
+            <a href="{{ route('products.index', array_merge(request()->except('category_id','page'), ['category_id' => $cat->id])) }}"
+               class="flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium border transition-all
+                      {{ request('category_id') == $cat->id ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-white text-gray-600 border-gray-300 hover:border-blue-400 hover:text-blue-600' }}">
+                {{ $cat->name }}
+            </a>
+            @endforeach
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-            <div>
-                <input type="text" 
-                       name="brand" 
-                       value="{{ request('brand') }}"
-                       placeholder="Brand (Samsung, iPhone, dll)"
-                       class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-            <div>
-                <select name="category_id" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="">Semua Kategori</option>
-                    @foreach($categories as $category)
-                    <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div>
-                <select name="condition" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+    </div>
+</div>
+
+{{-- Main --}}
+<div class="max-w-screen-xl mx-auto px-4 py-5">
+
+    {{-- Toolbar --}}
+    <div class="flex items-center justify-between mb-4">
+        <p class="text-sm text-gray-500">
+            <span class="font-semibold text-gray-800">{{ $products->total() }}</span> produk ditemukan
+        </p>
+        <div class="flex items-center gap-2">
+            {{-- Active filter count badge --}}
+            @php
+                $activeFilters = array_filter(request()->only(['search','location','min_price','max_price','condition','brand']));
+            @endphp
+            <button onclick="toggleFilters()"
+                    class="flex items-center gap-1.5 text-sm border px-3 py-1.5 rounded-lg transition
+                           {{ count($activeFilters) ? 'bg-blue-50 border-blue-400 text-blue-700 font-medium' : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50' }}">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M3 4h18M6 8h12M9 12h6M12 16h.01"/>
+                </svg>
+                Filter
+                @if(count($activeFilters))
+                    <span class="bg-blue-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">{{ count($activeFilters) }}</span>
+                @endif
+            </button>
+            @if(count($activeFilters) || request('category_id'))
+                <a href="{{ route('products.index') }}"
+                   class="text-xs text-red-500 hover:text-red-700 border border-red-200 hover:border-red-400 px-3 py-1.5 rounded-lg transition bg-red-50">
+                    Reset
+                </a>
+            @endif
+        </div>
+    </div>
+
+    {{-- Active filter badges --}}
+    @if(count($activeFilters))
+    <div class="flex flex-wrap gap-2 mb-4">
+        @if(request('search'))
+        <span class="inline-flex items-center gap-1 bg-blue-50 text-blue-700 border border-blue-200 text-xs px-3 py-1 rounded-full">
+            🔍 {{ request('search') }}
+            <a href="{{ route('products.index', request()->except('search','page')) }}" class="ml-1 font-bold hover:text-blue-900">×</a>
+        </span>
+        @endif
+        @if(request('location'))
+        <span class="inline-flex items-center gap-1 bg-blue-50 text-blue-700 border border-blue-200 text-xs px-3 py-1 rounded-full">
+            📍 {{ request('location') }}
+            <a href="{{ route('products.index', request()->except('location','page')) }}" class="ml-1 font-bold hover:text-blue-900">×</a>
+        </span>
+        @endif
+        @if(request('condition'))
+        @php $cl = ['new'=>'Baru','like_new'=>'Seperti Baru','good'=>'Baik','fair'=>'Cukup Baik']; @endphp
+        <span class="inline-flex items-center gap-1 bg-blue-50 text-blue-700 border border-blue-200 text-xs px-3 py-1 rounded-full">
+            {{ $cl[request('condition')] ?? request('condition') }}
+            <a href="{{ route('products.index', request()->except('condition','page')) }}" class="ml-1 font-bold hover:text-blue-900">×</a>
+        </span>
+        @endif
+        @if(request('min_price') || request('max_price'))
+        <span class="inline-flex items-center gap-1 bg-blue-50 text-blue-700 border border-blue-200 text-xs px-3 py-1 rounded-full">
+            Rp {{ number_format(request('min_price',0),0,',','.') }}–{{ request('max_price') ? number_format(request('max_price'),0,',','.') : '∞' }}
+            <a href="{{ route('products.index', request()->except('min_price','max_price','page')) }}" class="ml-1 font-bold hover:text-blue-900">×</a>
+        </span>
+        @endif
+    </div>
+    @endif
+
+    {{-- Collapsible Filter Panel --}}
+    <div id="filter-panel" class="{{ count($activeFilters) ? '' : 'hidden' }} mb-5">
+        <form action="{{ route('products.index') }}" method="GET"
+              class="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm">
+            @if(request('category_id'))
+                <input type="hidden" name="category_id" value="{{ request('category_id') }}">
+            @endif
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Kata kunci"
+                       class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 col-span-2 md:col-span-1">
+                <input type="text" name="location" value="{{ request('location') }}" placeholder="Lokasi"
+                       class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                <input type="text" name="brand" value="{{ request('brand') }}" placeholder="Brand"
+                       class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                <select name="condition" class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
                     <option value="">Semua Kondisi</option>
-                    <option value="new" {{ request('condition') == 'new' ? 'selected' : '' }}>Baru</option>
-                    <option value="like_new" {{ request('condition') == 'like_new' ? 'selected' : '' }}>Seperti Baru</option>
-                    <option value="good" {{ request('condition') == 'good' ? 'selected' : '' }}>Baik</option>
-                    <option value="fair" {{ request('condition') == 'fair' ? 'selected' : '' }}>Cukup Baik</option>
+                    <option value="new"      {{ request('condition')=='new'      ? 'selected':'' }}>Baru</option>
+                    <option value="like_new" {{ request('condition')=='like_new' ? 'selected':'' }}>Seperti Baru</option>
+                    <option value="good"     {{ request('condition')=='good'     ? 'selected':'' }}>Baik</option>
+                    <option value="fair"     {{ request('condition')=='fair'     ? 'selected':'' }}>Cukup Baik</option>
                 </select>
+                <input type="number" name="min_price" value="{{ request('min_price') }}" placeholder="Harga Min"
+                       class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                <input type="number" name="max_price" value="{{ request('max_price') }}" placeholder="Harga Max"
+                       class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
             </div>
-            <div class="flex gap-2">
-                <button type="submit" class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-                    Cari
+            <div class="flex gap-2 mt-3">
+                <button type="submit"
+                        class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-5 py-2 rounded-lg transition">
+                    Terapkan Filter
                 </button>
-                <a href="{{ route('products.index') }}" class="flex-1 bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 text-center">
+                <a href="{{ route('products.index') }}"
+                   class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium px-5 py-2 rounded-lg transition">
                     Reset
                 </a>
             </div>
-        </div>
-    </form>
-</div>
+        </form>
+    </div>
 
-<!-- Products Grid -->
-@if($products->count() > 0)
-<div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-    @foreach($products as $product)
-    <div class="bg-white rounded-lg shadow hover:shadow-lg transition">
-        <a href="{{ route('products.show', $product) }}">
-            <img src="{{ $product->photos->first() && $product->photos->first()->photo_url ? asset($product->photos->first()->photo_url) : 'https://via.placeholder.com/300x300?text=No+Image' }}" 
-                 alt="{{ $product->title }}"
-                 class="w-full h-48 object-cover rounded-t-lg">
-        </a>
-        <div class="p-4">
-            <a href="{{ route('products.show', $product) }}" class="block">
-                <h3 class="font-semibold text-lg mb-2 hover:text-blue-600">{{ $product->title }}</h3>
-            </a>
-            <p class="text-2xl font-bold text-blue-600 mb-2">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
-            <div class="flex items-center text-sm text-gray-600 mb-2">
-                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
-                </svg>
-                {{ $product->location }}
-            </div>
-            <div class="flex items-center text-sm text-gray-600">
-                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
-                </svg>
-                {{ $product->user->name }}
-            </div>
-            <div class="mt-2 space-y-2">
-                <span class="inline-block bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded">
-                    {{ ucfirst(str_replace('_', ' ', $product->condition)) }}
-                </span>
-                @if($product->category)
-                <span class="inline-block bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded">
-                    {{ $product->category->name }}
+    {{-- Product Grid --}}
+    @if($products->count() > 0)
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
+        @foreach($products as $product)
+        @php
+            $photo = $product->photos->first();
+            $imgSrc = ($photo && $photo->photo_url) ? asset($photo->photo_url) : null;
+            $condBadge = ['new' => ['Baru','bg-green-500'], 'like_new' => ['Spt Baru','bg-blue-500'], 'good' => ['Baik','bg-yellow-500'], 'fair' => ['Cukup Baik','bg-orange-500']];
+        @endphp
+        <a href="{{ route('products.show', $product) }}"
+           class="bg-white rounded-xl border border-gray-200 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 group overflow-hidden flex flex-col">
+
+            {{-- Photo --}}
+            <div class="relative overflow-hidden bg-gray-100" style="aspect-ratio:1/1;">
+                @if($imgSrc)
+                    <img src="{{ $imgSrc }}"
+                         alt="{{ $product->title }}"
+                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                         loading="lazy"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="w-full h-full items-center justify-center flex-col text-gray-400 absolute inset-0 bg-gray-100" style="display:none;">
+                        <svg class="w-10 h-10 text-gray-300 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <span class="text-xs">No Image</span>
+                    </div>
+                @else
+                    <div class="w-full h-full flex flex-col items-center justify-center text-gray-400">
+                        <svg class="w-10 h-10 text-gray-300 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <span class="text-xs">No Image</span>
+                    </div>
+                @endif
+
+                {{-- Badges --}}
+                @if($product->is_sold)
+                <div class="absolute inset-0 bg-black bg-opacity-45 flex items-center justify-center">
+                    <span class="bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full tracking-wide">TERJUAL</span>
+                </div>
+                @elseif(isset($condBadge[$product->condition]))
+                <span class="absolute top-2 left-2 {{ $condBadge[$product->condition][1] }} text-white text-xs font-semibold px-2 py-0.5 rounded-md shadow-sm">
+                    {{ $condBadge[$product->condition][0] }}
                 </span>
                 @endif
             </div>
 
-            @auth
-            <div class="mt-4">
-                <form action="{{ route('favorites.toggle', $product) }}" method="POST">
-                    @csrf
-                    <button type="submit" class="inline-flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium transition {{ !empty($product->is_favorited) ? 'border-red-500 bg-red-50 text-red-600' : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50' }}">
-                        {!! !empty($product->is_favorited) ? '❤️' : '🤍' !!}
-                        Favorit
-                    </button>
-                </form>
+            {{-- Info --}}
+            <div class="p-3 flex flex-col flex-1">
+                <p class="text-xs font-semibold text-gray-800 leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors mb-1.5">
+                    {{ $product->title }}
+                </p>
+                <p class="text-sm font-bold text-blue-600 mb-2">
+                    Rp {{ number_format($product->price, 0, ',', '.') }}
+                </p>
+                <div class="mt-auto flex items-center justify-between">
+                    <span class="text-xs text-gray-400 truncate max-w-[70%]">{{ $product->location }}</span>
+                    @if($product->category)
+                    <span class="text-xs bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded flex-shrink-0">{{ $product->category->name }}</span>
+                    @endif
+                </div>
             </div>
-            @else
-            <div class="mt-4">
-                <a href="{{ route('login') }}" class="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 text-sm">
-                    🤍 Login untuk favorit
-                </a>
-            </div>
-            @endauth
-        </div>
+        </a>
+        @endforeach
     </div>
-    @endforeach
+
+    <div class="mt-8 flex justify-center">
+        {{ $products->withQueryString()->links() }}
+    </div>
+
+    @else
+    <div class="bg-white rounded-2xl border border-gray-200 py-16 text-center">
+        <svg class="w-14 h-14 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                  d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+        </svg>
+        <p class="text-gray-600 font-medium">Tidak ada produk ditemukan</p>
+        <p class="text-sm text-gray-400 mt-1">Coba ubah filter atau kata kunci pencarian</p>
+        <a href="{{ route('products.index') }}"
+           class="mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-5 py-2 rounded-lg transition">
+            Lihat semua produk
+        </a>
+    </div>
+    @endif
 </div>
 
-<!-- Pagination -->
-<div class="mt-6">
-    {{ $products->links() }}
-</div>
-@else
-<div class="bg-white rounded-lg shadow p-8 text-center">
-    <p class="text-gray-600 text-lg">Tidak ada produk ditemukan.</p>
-</div>
-@endif
+@push('scripts')
+<script>
+function toggleFilters() {
+    document.getElementById('filter-panel').classList.toggle('hidden');
+}
+</script>
+@endpush
+
 @endsection
