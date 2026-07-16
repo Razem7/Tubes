@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Login - GadgetHub')
+@section('title', 'GadgetHub - Login')
 
 @section('content')
 <div class="min-h-[calc(100vh-64px)] flex items-center justify-center px-4 py-10 bg-gray-50">

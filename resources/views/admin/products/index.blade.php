@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Admin Manajemen Produk - GadgetHub')
+@section('title', 'GadgetHub - Admin Manajemen Produk')
 
 @section('content')
 <div class="flex flex-col gap-4">

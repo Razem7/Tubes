@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Kelola Produk - Admin')
+@section('title', 'GadgetHub - Kelola Produk')
 
 @section('content')
 <div class="mb-6">

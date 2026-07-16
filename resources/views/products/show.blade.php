@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $product->title . ' - GadgetHub')
+@section('title', 'GadgetHub - ' . $product->title)
 
 @section('content')
 <div class="max-w-5xl mx-auto px-4 py-6">

@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Kelola User - Admin')
+@section('title', 'GadgetHub - Kelola User')
 
 @section('content')
 <div class="mb-6">

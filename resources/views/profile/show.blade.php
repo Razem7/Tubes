@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Profil - GadgetHub')
+@section('title', 'GadgetHub - Profil')
 
 @section('content')
 <div class="max-w-2xl mx-auto">
