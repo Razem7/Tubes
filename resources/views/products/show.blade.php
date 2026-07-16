@@ -228,8 +228,8 @@
             </div>
 
             {{-- Detail Produk --}}
-            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
-                <p style="font-size:14px;font-weight:600;color:#111827;margin-bottom:8px;">Detail Produk</p>
+            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm" style="padding: 20px 24px;">
+                <p style="font-size:14px;font-weight:600;color:#111827;margin-bottom:12px;">Detail Produk</p>
                 <div style="font-size:13px;">
                     <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f9fafb;">
                         <span style="color:#6b7280;">Kondisi</span>
@@ -263,7 +263,7 @@
             </div>
 
             {{-- Safety Tips --}}
-            <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:16px;padding:14px;">
+            <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:16px;padding:18px 24px;">
                 <p style="font-size:12px;font-weight:700;color:#92400e;display:flex;align-items:center;gap:6px;margin-bottom:8px;">
                     <svg style="width:14px;height:14px;flex-shrink:0;" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
                     Tips Keamanan

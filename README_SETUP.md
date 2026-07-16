@@ -1,108 +1,106 @@
-# GadgetHub - Setup & Running Guide
+# GadgetHub — Setup Guide
 
-## ✅ SUDAH SELESAI!
+Marketplace jual beli barang elektronik bekas.
 
-Website GadgetHub sudah bisa dijalankan dengan fitur lengkap!
+## Requirements
 
----
+- PHP >= 8.2
+- Composer
+- MySQL >= 8.0
+- Node.js >= 18
 
-## 🚀 Cara Menjalankan
+## Instalasi
+
+### 1. Clone & install dependencies
+
+```bash
+git clone <repo-url>
+cd Tubes
+composer install
+npm install
+```
+
+### 2. Environment
+
+```bash
+cp .env.example .env
+php artisan key:generate
+```
+
+Edit `.env`, sesuaikan bagian database:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=gadgethub
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+### 3. Buat database
+
+Buka phpMyAdmin atau MySQL client, jalankan:
+
+```sql
+CREATE DATABASE gadgethub CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+### 4. Migrate & seed
+
+```bash
+php artisan migrate --seed
+```
+
+### 5. Storage symlink
+
+```bash
+php artisan storage:link
+```
+
+### 6. Build assets
+
+```bash
+npm run build
+```
+
+### 7. Jalankan server
 
 ```bash
 php artisan serve
 ```
 
-Akses: **http://localhost:8000**
+Buka http://localhost:8000
 
 ---
 
-## 🔐 Login Admin
+## Akun Default (setelah seeding)
 
-- URL: **http://localhost:8000/admin**
-- Email: `admin@gadgethub.com`
-- Password: `admin123`
-
----
-
-## 📋 Fitur yang Sudah Dibuat
-
-### User Biasa
-✅ Registrasi & Login  
-✅ Manajemen Profil (edit, upload foto)  
-✅ Pasang Iklan HP (1-8 foto, validasi harga)  
-✅ Edit & Hapus Iklan  
-✅ Pencarian & Filter (keyword, lokasi, harga, brand, kondisi)  
-✅ Chat dengan Penjual (realtime)  
-✅ Favorit Produk  
-
-### Admin Panel
-✅ Dashboard dengan Statistik (total users, products, chats)  
-✅ Kelola Semua Produk (lihat & hapus)  
-✅ Kelola User (lihat & hapus)  
-✅ Protected dengan middleware (hanya admin bisa akses)  
+| Role  | Email             | Password |
+|-------|-------------------|----------|
+| Admin | admin@gadgethub.com | password |
 
 ---
 
-## 💰 Perbaikan Harga
+## Troubleshooting
 
-✅ Tidak bisa input harga minus  
-✅ Bisa input harga desimal (contoh: 3000000.50)  
-✅ Validasi minimal Rp 0.01  
-✅ Format: `min="0.01" step="0.01"`  
+### Error tablespace saat migrate
 
----
+Terjadi kalau database pernah dihapus manual (lewat file system) tanpa DROP DATABASE.
 
-## 🗂️ Database
+**Solusi:** Di phpMyAdmin → tab SQL, jalankan:
 
-Tables yang sudah dibuat:
-- `users` (dengan kolom is_admin)
-- `products`
-- `product_photos`
-- `chats`
-- `messages`
-- `favorites`
-- `transactions`
+```sql
+DROP DATABASE IF EXISTS gadgethub;
+CREATE DATABASE gadgethub CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
 
----
+Lalu `php artisan migrate --seed` lagi.
 
-## 📱 Cara Pakai
+### Foto tidak muncul
 
-### Sebagai User:
-1. Daftar akun baru
-2. Pasang iklan HP bekas
-3. Chat dengan pembeli
-4. Tandai favorit produk menarik
+Pastikan sudah menjalankan:
 
-### Sebagai Admin:
-1. Login dengan akun admin
-2. Akses `/admin`
-3. Monitor statistik
-4. Kelola produk & user
-
----
-
-## 📝 Catatan Teknis
-
-- ✅ Migrations sudah running
-- ✅ Storage link sudah dibuat
-- ✅ Admin seeder sudah jalan
-- ✅ Validasi form lengkap
-- ✅ Authorization (Policy) untuk edit/delete
-- ✅ Middleware admin untuk protect admin panel
-
----
-
-## ⚠️ Yang Perlu Dicek
-
-1. **npm install & npm run build** - untuk compile Tailwind CSS
-2. **XAMPP MySQL** - pastikan sudah running
-3. **Database `gadgethub`** - pastikan sudah dibuat
-
----
-
-## 👥 Tim
-
-- Daffa Azaria (714250006)
-- Rao Azeem Samudra (714250040)
-
-Proyek 1 - D4 Teknik Informatika
+```bash
+php artisan storage:link
+```

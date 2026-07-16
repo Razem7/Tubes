@@ -9,29 +9,44 @@ use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Users
+        User::firstOrCreate(
+            ['email' => 'admin@example.com'],
+            [
+                'name'     => 'Admin User',
+                'password' => Hash::make('Admin1234!'),
+                'is_admin' => true,
+            ]
+        );
 
-        User::factory()->create([
-            'name' => 'Admin User',
-            'email' => 'admin@example.com',
-            'password' => Hash::make('Admin1234!'),
-            'is_admin' => true,
-        ]);
+        User::firstOrCreate(
+            ['email' => 'test@example.com'],
+            [
+                'name'     => 'Test User',
+                'password' => Hash::make('password'),
+            ]
+        );
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        User::firstOrCreate(
+            ['email' => 'adul@example.com'],
+            [
+                'name'     => 'abdul saputra',
+                'password' => Hash::make('Adul12345'),
+                'is_admin' => false,
+            ]
+        );
 
-        $categories = ['Smartphone', 'Tablet', 'Laptop', 'Aksesori', 'Smartwatch', 'Kamera'];
-
-        foreach ($categories as $categoryName) {
-            Category::firstOrCreate(['name' => $categoryName]);
+        // Categories
+        foreach (['Smartphone', 'Tablet', 'Laptop', 'Aksesori', 'Smartwatch', 'Kamera'] as $name) {
+            Category::firstOrCreate(['name' => $name]);
         }
+
+        // Seeders
+        $this->call([
+            AdminSeeder::class,
+            ProductSeeder::class,
+        ]);
     }
 }
