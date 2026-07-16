@@ -11,21 +11,13 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Users
-        User::firstOrCreate(
-            ['email' => 'admin@example.com'],
-            [
-                'name'     => 'Admin User',
-                'password' => Hash::make('Admin1234!'),
-                'is_admin' => true,
-            ]
-        );
-
+        // Sample users
         User::firstOrCreate(
             ['email' => 'test@example.com'],
             [
                 'name'     => 'Test User',
                 'password' => Hash::make('password'),
+                'role'     => 'user',
             ]
         );
 
@@ -34,7 +26,7 @@ class DatabaseSeeder extends Seeder
             [
                 'name'     => 'abdul saputra',
                 'password' => Hash::make('Adul12345'),
-                'is_admin' => false,
+                'role'     => 'user',
             ]
         );
 
@@ -46,6 +38,7 @@ class DatabaseSeeder extends Seeder
         // Seeders
         $this->call([
             AdminSeeder::class,
+            MerchantSeeder::class,
             ProductSeeder::class,
         ]);
     }

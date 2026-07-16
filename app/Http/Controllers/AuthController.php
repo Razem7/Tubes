@@ -18,17 +18,18 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => ['required', 'confirmed', Password::min(8)],
+            'name'         => 'required|string|max:255',
+            'email'        => 'required|string|email|max:255|unique:users',
+            'password'     => ['required', 'confirmed', Password::min(8)],
             'phone_number' => 'nullable|string|max:20',
         ]);
 
         $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
+            'name'         => $validated['name'],
+            'email'        => $validated['email'],
+            'password'     => Hash::make($validated['password']),
             'phone_number' => $validated['phone_number'] ?? null,
+            'role'         => 'user',
         ]);
 
         Auth::login($user);
@@ -44,16 +45,21 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'email' => 'required|email',
+            'email'    => 'required|email',
             'password' => 'required',
         ]);
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
 
-            // Admin langsung diarahkan ke dashboard admin
-            if (Auth::user()->is_admin) {
-                return redirect()->route('admin.dashboard')->with('success', 'Selamat datang, Admin!');
+            $user = Auth::user();
+
+            if ($user->isSuperAdmin()) {
+                return redirect()->route('admin.dashboard')->with('success', 'Selamat datang, Super Admin!');
+            }
+
+            if ($user->isMerchant()) {
+                return redirect()->route('merchant.dashboard')->with('success', 'Selamat datang, ' . $user->name . '!');
             }
 
             return redirect()->intended(route('products.index'))->with('success', 'Selamat datang kembali!');

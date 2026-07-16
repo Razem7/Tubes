@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Transaction;
+use App\Notifications\NewTransactionNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -78,6 +79,10 @@ class TransactionController extends Controller
             ]);
 
             $product->update(['is_sold' => true]);
+
+            // Notifikasi ke seller
+            $transaction->load('product', 'buyer');
+            $product->user->notify(new NewTransactionNotification($transaction));
         });
 
         return redirect()->route('transactions.index')->with('success', 'Pesanan berhasil dibuat. Silakan cek riwayat transaksi Anda.');

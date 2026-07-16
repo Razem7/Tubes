@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Chat;
 use App\Models\Product;
+use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -13,10 +15,12 @@ class DashboardController extends Controller
     public function index()
     {
         $stats = [
-            'total_users' => User::where('is_admin', false)->count(),
-            'total_products' => Product::count(),
-            'total_sold' => Product::where('is_sold', true)->count(),
-            'total_chats' => Chat::count(),
+            'total_users'     => User::where('role', 'user')->count(),
+            'total_merchants' => User::where('role', 'merchant')->count(),
+            'total_products'  => Product::count(),
+            'total_sold'      => Product::where('is_sold', true)->count(),
+            'total_chats'     => Chat::count(),
+            'total_revenue'   => Transaction::where('status', '!=', 'cancelled')->sum('amount'),
         ];
 
         $recent_products = Product::with(['user', 'photos'])
@@ -24,7 +28,7 @@ class DashboardController extends Controller
             ->take(10)
             ->get();
 
-        $recent_users = User::where('is_admin', false)
+        $recent_users = User::whereIn('role', ['user', 'merchant'])
             ->latest()
             ->take(10)
             ->get();
@@ -32,16 +36,22 @@ class DashboardController extends Controller
         return view('admin.dashboard', compact('stats', 'recent_products', 'recent_users'));
     }
 
+    // ── Products ──────────────────────────────────────────────────────────
+
     public function products(Request $request)
     {
-        $query = Product::with(['user', 'photos']);
+        $query = Product::with(['user', 'photos', 'category']);
 
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
+                  ->orWhere('description', 'like', "%{$search}%");
             });
+        }
+
+        if ($request->filled('role')) {
+            $query->whereHas('user', fn($q) => $q->where('role', $request->role));
         }
 
         $products = $query->latest()->paginate(20);
@@ -57,22 +67,27 @@ class DashboardController extends Controller
             }
             $photo->delete();
         }
-
         $product->delete();
 
         return back()->with('success', 'Produk berhasil dihapus!');
     }
 
+    // ── Users ─────────────────────────────────────────────────────────────
+
     public function users(Request $request)
     {
-        $query = User::where('is_admin', false);
+        $query = User::whereIn('role', ['user', 'merchant']);
 
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%");
+                  ->orWhere('email', 'like', "%{$search}%");
             });
+        }
+
+        if ($request->filled('role')) {
+            $query->where('role', $request->role);
         }
 
         $users = $query->latest()->paginate(20);
@@ -82,11 +97,10 @@ class DashboardController extends Controller
 
     public function deleteUser(User $user)
     {
-        if ($user->is_admin) {
-            return back()->with('error', 'Tidak bisa menghapus admin!');
+        if ($user->isSuperAdmin()) {
+            return back()->with('error', 'Tidak bisa menghapus Super Admin!');
         }
 
-        // Delete user's products
         foreach ($user->products as $product) {
             foreach ($product->photos as $photo) {
                 if (!empty($photo->photo_url)) {
@@ -100,5 +114,65 @@ class DashboardController extends Controller
         $user->delete();
 
         return back()->with('success', 'User berhasil dihapus!');
+    }
+
+    public function promoteToMerchant(User $user)
+    {
+        if (!$user->isUser()) {
+            return back()->with('error', 'Hanya user biasa yang bisa dipromosikan ke Merchant.');
+        }
+
+        $user->update(['role' => 'merchant']);
+
+        return back()->with('success', $user->name . ' berhasil dipromosikan menjadi Merchant!');
+    }
+
+    public function demoteToUser(User $user)
+    {
+        if (!$user->isMerchant()) {
+            return back()->with('error', 'User ini bukan Merchant.');
+        }
+
+        $user->update(['role' => 'user']);
+
+        return back()->with('success', $user->name . ' berhasil diubah menjadi User biasa!');
+    }
+
+    // ── Categories ────────────────────────────────────────────────────────
+
+    public function categories()
+    {
+        $categories = Category::withCount('products')->orderBy('name')->get();
+
+        return view('admin.categories', compact('categories'));
+    }
+
+    public function storeCategory(Request $request)
+    {
+        $request->validate(['name' => 'required|string|max:100|unique:categories,name']);
+
+        Category::create(['name' => $request->name]);
+
+        return back()->with('success', 'Kategori berhasil ditambahkan!');
+    }
+
+    public function updateCategory(Request $request, Category $category)
+    {
+        $request->validate(['name' => 'required|string|max:100|unique:categories,name,' . $category->id]);
+
+        $category->update(['name' => $request->name]);
+
+        return back()->with('success', 'Kategori berhasil diubah!');
+    }
+
+    public function deleteCategory(Category $category)
+    {
+        if ($category->products()->count() > 0) {
+            return back()->with('error', 'Kategori tidak bisa dihapus karena masih memiliki produk!');
+        }
+
+        $category->delete();
+
+        return back()->with('success', 'Kategori berhasil dihapus!');
     }
 }

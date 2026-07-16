@@ -58,44 +58,65 @@
                                 Pasang Iklan
                             </a>
                         @endif
-
-                        <!-- User dropdown -->
                         <div class="relative">
                             <button type="button" onclick="toggleDropdown()" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition">
-                                <img src="{{ auth()->user()->profile_photo_url ? asset('storage/' . auth()->user()->profile_photo_url) : 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->name) . '&background=2563eb&color=fff' }}"
-                                     alt="Profile"
-                                     class="w-8 h-8 rounded-full object-cover">
+                                <!-- Foto profil dengan titik merah notifikasi -->
+                                <div class="relative flex-shrink-0">
+                                    <img src="{{ auth()->user()->profile_photo_url ? asset('storage/' . auth()->user()->profile_photo_url) : 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->name) . '&background=2563eb&color=fff' }}"
+                                         alt="Profile"
+                                         class="w-8 h-8 rounded-full object-cover">
+                                    <span id="profile-dot" style="display:none; position:absolute; top:-2px; right:-2px; width:11px; height:11px; background:#ef4444; border:2px solid #fff; border-radius:50%;"></span>
+                                </div>
                                 <span class="text-sm font-medium text-gray-700 max-w-[100px] truncate">{{ auth()->user()->name }}</span>
                                 <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                 </svg>
                             </button>
                             <div id="dropdown" class="hidden absolute right-0 mt-1 w-52 bg-white rounded-xl shadow-xl border border-gray-100 py-1" style="z-index:9999; top:100%;">
-                                @if(!auth()->user()->is_admin)
-                                    <a href="{{ route('products.my') }}" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 3H8l-2 4h12l-2-4z"/></svg>
-                                        Produk Saya
-                                    </a>
+                                @if(!auth()->user()->isSuperAdmin())
+                                    @if(auth()->user()->isMerchant())
+                                        {{-- Merchant: link ke dashboard merchant --}}
+                                        <a href="{{ route('merchant.dashboard') }}" class="flex items-center gap-2 px-4 py-2 text-sm text-purple-700 hover:bg-purple-50 font-medium">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
+                                            Dashboard Merchant
+                                        </a>
+                                        <div class="border-t border-gray-100 my-1"></div>
+                                    @elseif(auth()->user()->isUser())
+                                        {{-- User biasa: link daftar merchant --}}
+                                        <a href="{{ route('merchant.apply.create') }}" class="flex items-center gap-2 px-4 py-2 text-sm text-purple-700 hover:bg-purple-50 font-medium">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"/><path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd"/></svg>
+                                            Daftar jadi Merchant
+                                        </a>
+                                        <div class="border-t border-gray-100 my-1"></div>
+                                    @endif
                                     <a href="{{ route('favorites.index') }}" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                                         <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
                                         Favorit
                                     </a>
-                                    <a href="{{ route('chats.index') }}" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-                                        Chat
+                                    <a href="{{ route('chats.index') }}" class="flex items-center justify-between px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                        <span class="flex items-center gap-2">
+                                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                                            Chat
+                                        </span>
+                                        <span id="chat-dot" style="display:none; width:10px; height:10px; background:#ef4444; border-radius:50%; flex-shrink:0;"></span>
                                     </a>
-                                    <a href="{{ route('transactions.index') }}" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                                        Transaksi
-                                    </a>
+                                    @if(auth()->user()->isUser())
+                                        <a href="{{ route('transactions.index') }}" class="flex items-center justify-between px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                            <span class="flex items-center gap-2">
+                                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                                                Transaksi
+                                            </span>
+                                            <span id="transaction-dot" style="display:none; width:10px; height:10px; background:#ef4444; border-radius:50%; flex-shrink:0;"></span>
+                                        </a>
+                                    @endif
                                     <div class="border-t border-gray-100 my-1"></div>
                                 @endif
                                 <a href="{{ route('profile.show') }}" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                                     <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                                     Profil Saya
                                 </a>
-                                @if(auth()->user()->is_admin)
-                                    <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2 px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 font-medium">
+                                @if(auth()->user()->isSuperAdmin())
+                                    <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 font-medium">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
                                         Admin Dashboard
                                     </a>
@@ -330,6 +351,56 @@
                 if (e.target === this) closeLoginModal();
             });
         }
+
+        @auth
+        // ── Notification polling ──────────────────────────────────────────
+        const NOTIF_URL      = '{{ route("notifications.index") }}';
+        const NOTIF_READ_ALL = '{{ route("notifications.read-all") }}';
+        const CSRF           = document.querySelector('meta[name="csrf-token"]').content;
+
+        function renderNotifications(data) {
+            const profileDot     = document.getElementById('profile-dot');
+            const chatDot        = document.getElementById('chat-dot');
+            const transactionDot = document.getElementById('transaction-dot');
+
+            const types          = data.notifications.map(n => n.type);
+            const hasMessage     = types.includes('new_message');
+            const hasTransaction = types.includes('new_transaction');
+            const hasAny         = data.count > 0;
+
+            if (profileDot)     profileDot.style.display     = hasAny         ? 'block'        : 'none';
+            if (chatDot)        chatDot.style.display         = hasMessage     ? 'inline-block' : 'none';
+            if (transactionDot) transactionDot.style.display  = hasTransaction ? 'inline-block' : 'none';
+        }
+
+        function fetchNotifications() {
+            fetch(NOTIF_URL, {
+                credentials: 'same-origin',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+                .then(r => r.ok ? r.json() : null)
+                .then(data => { if (data) renderNotifications(data); })
+                .catch(() => {});
+        }
+
+        function markAsRead(id) {
+            fetch(`/notifications/${id}/read`, {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': CSRF, 'X-Requested-With': 'XMLHttpRequest' },
+            }).then(() => fetchNotifications()).catch(() => {});
+        }
+
+        function markAllRead() {
+            fetch(NOTIF_READ_ALL, {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': CSRF, 'X-Requested-With': 'XMLHttpRequest' },
+            }).then(() => fetchNotifications()).catch(() => {});
+        }
+
+        // Polling setiap 15 detik
+        fetchNotifications();
+        setInterval(fetchNotifications, 15000);
+        @endauth
     </script>
 
     @stack('scripts')

@@ -9,16 +9,14 @@ use Symfony\Component\HttpFoundation\Response;
 class IsNotAdmin
 {
     /**
-     * Handle an incoming request.
-     * Blocks admin users from accessing regular user-only features.
-     *
-     * @param  Closure(Request): (Response)  $next
+     * Blokir super_admin dari fitur user biasa.
+     * Merchant dan user biasa boleh lewat.
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth()->check() && auth()->user()->is_admin) {
+        if (auth()->check() && auth()->user()->isSuperAdmin()) {
             return redirect()->route('admin.dashboard')
-                ->with('error', 'Admin tidak bisa mengakses fitur ini.');
+                ->with('error', 'Super Admin tidak bisa mengakses fitur ini.');
         }
 
         return $next($request);

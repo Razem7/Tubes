@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Chat;
 use App\Models\Message;
 use App\Models\Product;
+use App\Notifications\NewMessageNotification;
 use Illuminate\Http\Request;
 
 class ChatController extends Controller
@@ -78,6 +79,14 @@ class ChatController extends Controller
         ]);
 
         $chat->touch(); // Update chat's updated_at timestamp
+
+        // Kirim notifikasi ke penerima (lawan bicara)
+        $recipientId = $chat->buyer_id === auth()->id() ? $chat->seller_id : $chat->buyer_id;
+        $recipient = \App\Models\User::find($recipientId);
+        if ($recipient) {
+            $message->load('sender', 'chat');
+            $recipient->notify(new NewMessageNotification($message));
+        }
 
         if ($request->expectsJson()) {
             return response()->json([
