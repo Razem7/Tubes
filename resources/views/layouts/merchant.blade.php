@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Merchant - GadgetHub')</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="alternate icon" href="/favicon.ico">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-gray-100 flex flex-col min-h-screen">
@@ -13,8 +15,16 @@
     <nav class="bg-white shadow-sm border-b">
         <div class="container mx-auto px-4">
             <div class="flex justify-between items-center h-16">
-                <a href="{{ route('merchant.dashboard') }}" class="text-xl font-bold text-purple-600 flex items-center gap-2">
-                    <span class="text-2xl">🏪</span> Merchant GadgetHub
+                <a href="{{ route('merchant.dashboard') }}" class="flex items-center gap-2 flex-shrink-0">
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background: linear-gradient(135deg, #1d4ed8, #3b82f6);">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <div class="leading-tight">
+                        <span class="block text-base font-extrabold tracking-tight text-blue-700">GadgetHub</span>
+                        <span class="block text-xs font-semibold text-purple-600 -mt-0.5">Merchant Panel</span>
+                    </div>
                 </a>
                 <div class="flex items-center gap-4">
                     <a href="{{ route('products.index') }}" target="_blank" class="text-sm text-gray-600 hover:text-blue-600">
@@ -71,6 +81,12 @@
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm2 10a1 1 0 10-2 0v3a1 1 0 102 0v-3zm2-3a1 1 0 011 1v5a1 1 0 11-2 0v-5a1 1 0 011-1zm4-1a1 1 0 10-2 0v7a1 1 0 102 0V8z" clip-rule="evenodd"/></svg>
                         Data Penjualan
                     </a>
+                    <a href="{{ route('chats.index') }}"
+                       class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('chats*') ? 'bg-purple-50 text-purple-700' : 'text-gray-700 hover:bg-gray-100' }}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                        <span class="flex-1">Chat</span>
+                        <span id="sidebar-chat-badge" style="display:none;" class="bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center"></span>
+                    </a>
                 </nav>
             </div>
         </aside>
@@ -111,23 +127,39 @@
             }
         });
 
-        // Notification dots
         @auth
-        const NOTIF_URL = '{{ route("notifications.index") }}';
-        const CSRF = document.querySelector('meta[name="csrf-token"]').content;
+        const NOTIF_URL        = '{{ route("notifications.index") }}';
+        const UNREAD_CHATS_URL = '{{ route("notifications.unread-chats") }}';
+        const CSRF             = document.querySelector('meta[name="csrf-token"]').content;
 
-        function fetchNotifications() {
-            fetch(NOTIF_URL, { credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-                .then(r => r.ok ? r.json() : null)
-                .then(data => {
-                    if (!data) return;
-                    const profileDot = document.getElementById('profile-dot');
-                    if (profileDot) profileDot.style.display = data.count > 0 ? 'block' : 'none';
-                })
-                .catch(() => {});
+        function updateDots() {
+            Promise.all([
+                fetch(NOTIF_URL,        { credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } }).then(r => r.ok ? r.json() : null),
+                fetch(UNREAD_CHATS_URL, { credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } }).then(r => r.ok ? r.json() : null),
+            ]).then(([notifData, chatData]) => {
+                const notifCount = notifData?.count ?? 0;
+                const chatCount  = chatData?.count  ?? 0;
+
+                // Profile dot di navbar: nyala jika ada notif apapun ATAU ada unread chat
+                const profileDot = document.getElementById('profile-dot');
+                if (profileDot) profileDot.style.display = (notifCount > 0 || chatCount > 0) ? 'block' : 'none';
+
+                // Badge chat di sidebar
+                const badge = document.getElementById('sidebar-chat-badge');
+                if (badge) {
+                    if (chatCount > 0) {
+                        badge.textContent = chatCount;
+                        badge.style.display = 'inline-block';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                }
+            }).catch(() => {});
         }
-        fetchNotifications();
-        setInterval(fetchNotifications, 15000);
+
+        // Jalankan langsung dan polling tiap 15 detik
+        updateDots();
+        setInterval(updateDots, 15000);
         @endauth
     </script>
     @stack('scripts')

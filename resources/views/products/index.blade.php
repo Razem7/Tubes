@@ -4,13 +4,32 @@
 
 @section('content')
 
-{{-- Hero --}}
+{{-- Banner / Hero --}}
+@if($banners->count() > 0)
+@php $banner = $banners->first(); @endphp
+<div class="bg-gray-900 py-3">
+    <div class="max-w-screen-xl mx-auto px-4">
+        @if($banner->link_url)
+            <a href="{{ $banner->link_url }}" target="_blank" class="block">
+        @endif
+            <img src="{{ asset('storage/' . $banner->image_url) }}"
+                 alt="{{ $banner->title }}"
+                 class="w-full object-contain rounded-xl mx-auto"
+                 style="max-height: 260px; display: block;">
+        @if($banner->link_url)
+            </a>
+        @endif
+    </div>
+</div>
+@else
+{{-- Fallback hero jika belum ada banner --}}
 <div class="py-8 px-4" style="background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 60%, #3b82f6 100%);">
     <div class="max-w-screen-xl mx-auto text-center">
         <h1 class="text-xl md:text-2xl font-bold text-white mb-1">Temukan Barang Elektronik Bekas Terbaik</h1>
         <p class="text-blue-100 text-sm">Transaksi aman, harga terjangkau, pilihan terlengkap.</p>
     </div>
 </div>
+@endif
 
 {{-- Category Chips --}}
 <div class="bg-white border-b border-gray-200 sticky top-16 z-40">
@@ -144,6 +163,7 @@
             $photo = $product->photos->first();
             $imgSrc = ($photo && $photo->photo_url) ? asset($photo->photo_url) : null;
             $condBadge = ['new' => ['Baru','bg-green-500'], 'like_new' => ['Spt Baru','bg-blue-500'], 'good' => ['Baik','bg-yellow-500'], 'fair' => ['Cukup Baik','bg-orange-500']];
+            $isMerchant = $product->user && $product->user->isMerchant();
         @endphp
         <a href="{{ route('products.show', $product) }}"
            class="bg-white rounded-xl border border-gray-200 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 group overflow-hidden flex flex-col">
@@ -191,11 +211,24 @@
                 <p class="text-sm font-bold text-blue-600 mb-2">
                     Rp {{ number_format($product->price, 0, ',', '.') }}
                 </p>
-                <div class="mt-auto flex items-center justify-between">
-                    <span class="text-xs text-gray-400 truncate max-w-[70%]">{{ $product->location }}</span>
-                    @if($product->category)
-                    <span class="text-xs bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded flex-shrink-0">{{ $product->category->name }}</span>
-                    @endif
+                <div class="mt-auto space-y-1">
+                    {{-- Seller info dengan badge role --}}
+                    <div class="flex items-center gap-1">
+                        @if($isMerchant)
+                            <span class="inline-flex items-center gap-0.5 bg-purple-100 text-purple-700 text-xs font-semibold px-1.5 py-0.5 rounded flex-shrink-0">
+                                <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"/><path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd"/></svg>
+                                Toko
+                            </span>
+                        @endif
+                        <span class="text-xs text-gray-500 truncate">{{ $product->user->name ?? '-' }}</span>
+                    </div>
+                    {{-- Lokasi & Kategori --}}
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-gray-400 truncate max-w-[70%]">{{ $product->location }}</span>
+                        @if($product->category)
+                        <span class="text-xs bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded flex-shrink-0">{{ $product->category->name }}</span>
+                        @endif
+                    </div>
                 </div>
             </div>
         </a>

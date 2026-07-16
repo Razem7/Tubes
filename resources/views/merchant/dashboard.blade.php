@@ -84,6 +84,49 @@
     </div>
 </div>
 
+<!-- Chat Terbaru -->
+<div class="mt-6 bg-white rounded-xl shadow-sm">
+    <div class="px-6 py-4 border-b flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <h3 class="font-semibold text-gray-800">Chat Masuk</h3>
+            @if($unread_chats > 0)
+                <span class="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">{{ $unread_chats }} belum dibaca</span>
+            @endif
+        </div>
+        <a href="{{ route('chats.index') }}" class="text-sm text-purple-600 hover:underline">Lihat semua</a>
+    </div>
+    <div class="divide-y">
+        @forelse($recent_chats as $chat)
+        @php
+            $hasUnread = $chat->messages->where('sender_id', '!=', auth()->id())->whereNull('read_at')->count() > 0;
+        @endphp
+        <a href="{{ route('chats.show', $chat) }}" class="flex items-center gap-3 px-6 py-3 hover:bg-gray-50 transition {{ $hasUnread ? 'bg-purple-50' : '' }}">
+            <img src="{{ 'https://ui-avatars.com/api/?name=' . urlencode($chat->buyer->name) . '&background=6366f1&color=fff' }}"
+                 class="w-9 h-9 rounded-full object-cover flex-shrink-0">
+            <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between gap-2">
+                    <p class="text-sm font-medium text-gray-800 truncate">{{ $chat->buyer->name }}</p>
+                    <span class="text-xs text-gray-400 flex-shrink-0">{{ $chat->updated_at->diffForHumans() }}</span>
+                </div>
+                <p class="text-xs text-gray-500 truncate">
+                    re: {{ $chat->product->title ?? 'Produk dihapus' }}
+                </p>
+                @if($chat->latestMessage)
+                    <p class="text-xs truncate {{ $hasUnread ? 'text-purple-700 font-semibold' : 'text-gray-400' }}">
+                        {{ $chat->latestMessage->message_text }}
+                    </p>
+                @endif
+            </div>
+            @if($hasUnread)
+                <span class="w-2.5 h-2.5 bg-red-500 rounded-full flex-shrink-0"></span>
+            @endif
+        </a>
+        @empty
+        <p class="px-6 py-6 text-sm text-gray-400 text-center">Belum ada chat masuk dari pembeli.</p>
+        @endforelse
+    </div>
+</div>
+
 <!-- Quick Actions -->
 <div class="mt-6 flex gap-3 flex-wrap">
     <a href="{{ route('merchant.products.create') }}"

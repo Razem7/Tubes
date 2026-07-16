@@ -25,7 +25,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
                         </svg>
                     </div>
-                    <span class="text-xl font-extrabold tracking-tight" style="background: linear-gradient(135deg, #1d4ed8, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">GadgetHub</span>
+                    <span class="text-xl font-extrabold tracking-tight text-blue-700">GadgetHub</span>
                 </a>
 
                 <!-- Search bar (desktop) -->
@@ -354,33 +354,53 @@
 
         @auth
         // ── Notification polling ──────────────────────────────────────────
-        const NOTIF_URL      = '{{ route("notifications.index") }}';
-        const NOTIF_READ_ALL = '{{ route("notifications.read-all") }}';
-        const CSRF           = document.querySelector('meta[name="csrf-token"]').content;
+        const NOTIF_URL        = '{{ route("notifications.index") }}';
+        const UNREAD_CHATS_URL = '{{ route("notifications.unread-chats") }}';
+        const NOTIF_READ_ALL   = '{{ route("notifications.read-all") }}';
+        const CSRF             = document.querySelector('meta[name="csrf-token"]').content;
 
         function renderNotifications(data) {
             const profileDot     = document.getElementById('profile-dot');
-            const chatDot        = document.getElementById('chat-dot');
             const transactionDot = document.getElementById('transaction-dot');
 
             const types          = data.notifications.map(n => n.type);
-            const hasMessage     = types.includes('new_message');
             const hasTransaction = types.includes('new_transaction');
-            const hasAny         = data.count > 0;
 
-            if (profileDot)     profileDot.style.display     = hasAny         ? 'block'        : 'none';
-            if (chatDot)        chatDot.style.display         = hasMessage     ? 'inline-block' : 'none';
-            if (transactionDot) transactionDot.style.display  = hasTransaction ? 'inline-block' : 'none';
+            if (transactionDot) transactionDot.style.display = hasTransaction ? 'inline-block' : 'none';
+
+            // profile-dot: nyala jika ada notif apapun ATAU ada unread chat
+            updateProfileDot();
+        }
+
+        function updateChatDot(count) {
+            const chatDot = document.getElementById('chat-dot');
+            if (chatDot) chatDot.style.display = count > 0 ? 'inline-block' : 'none';
+        }
+
+        function updateProfileDot() {
+            // Ambil dari dua sumber: notifikasi unread + unread chat
+            Promise.all([
+                fetch(NOTIF_URL,        { credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } }).then(r => r.ok ? r.json() : null),
+                fetch(UNREAD_CHATS_URL, { credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } }).then(r => r.ok ? r.json() : null),
+            ]).then(([notifData, chatData]) => {
+                const profileDot     = document.getElementById('profile-dot');
+                const transactionDot = document.getElementById('transaction-dot');
+
+                const notifCount  = notifData?.count  ?? 0;
+                const chatCount   = chatData?.count   ?? 0;
+
+                const types          = (notifData?.notifications ?? []).map(n => n.type);
+                const hasTransaction = types.includes('new_transaction');
+
+                if (transactionDot) transactionDot.style.display = hasTransaction ? 'inline-block' : 'none';
+                updateChatDot(chatCount);
+
+                if (profileDot) profileDot.style.display = (notifCount > 0 || chatCount > 0) ? 'block' : 'none';
+            }).catch(() => {});
         }
 
         function fetchNotifications() {
-            fetch(NOTIF_URL, {
-                credentials: 'same-origin',
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            })
-                .then(r => r.ok ? r.json() : null)
-                .then(data => { if (data) renderNotifications(data); })
-                .catch(() => {});
+            updateProfileDot();
         }
 
         function markAsRead(id) {

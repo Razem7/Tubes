@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Merchant;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Chat;
 use App\Models\Product;
 use App\Models\ProductPhoto;
 use App\Models\Transaction;
@@ -47,7 +48,25 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        return view('merchant.dashboard', compact('stats', 'recent_products', 'recent_sales'));
+        // Chat terbaru dan unread count untuk merchant
+        $recent_chats = Chat::where('seller_id', $user->id)
+            ->with([
+                'product',
+                'buyer',
+                'latestMessage',
+                'messages' => fn($q) => $q->where('sender_id', '!=', $user->id)->whereNull('read_at'),
+            ])
+            ->latest('updated_at')
+            ->take(5)
+            ->get();
+
+        $unread_chats = Chat::where('seller_id', $user->id)
+            ->whereHas('messages', function ($q) use ($user) {
+                $q->where('sender_id', '!=', $user->id)->whereNull('read_at');
+            })
+            ->count();
+
+        return view('merchant.dashboard', compact('stats', 'recent_products', 'recent_sales', 'recent_chats', 'unread_chats'));
     }
 
     // ── Products ──────────────────────────────────────────────────────────

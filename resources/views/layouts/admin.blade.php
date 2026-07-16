@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Super Admin - GadgetHub')</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="alternate icon" href="/favicon.ico">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-gray-100 flex flex-col min-h-screen">
@@ -12,8 +14,16 @@
     <nav class="bg-white shadow-sm border-b">
         <div class="container mx-auto px-4">
             <div class="flex justify-between items-center h-16">
-                <a href="{{ route('admin.dashboard') }}" class="text-xl font-bold text-red-600 flex items-center gap-2">
-                    <span class="text-2xl">🛡️</span> Super Admin GadgetHub
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2 flex-shrink-0">
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background: linear-gradient(135deg, #1d4ed8, #3b82f6);">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <div class="leading-tight">
+                        <span class="block text-base font-extrabold tracking-tight text-blue-700">GadgetHub</span>
+                        <span class="block text-xs font-semibold text-red-600 -mt-0.5">Super Admin</span>
+                    </div>
                 </a>
                 <div class="flex items-center gap-4">
                     <a href="{{ route('products.index') }}" target="_blank" class="text-sm text-gray-600 hover:text-blue-600">
@@ -62,6 +72,11 @@
                        class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('admin.categories*') ? 'bg-red-50 text-red-600' : 'text-gray-700 hover:bg-gray-100' }}">
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"/></svg>
                         Kategori
+                    </a>
+                    <a href="{{ route('admin.banners') }}"
+                       class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('admin.banners*') ? 'bg-red-50 text-red-600' : 'text-gray-700 hover:bg-gray-100' }}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        Banner
                     </a>
                     <a href="{{ route('admin.merchant-applications.index') }}"
                        class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('admin.merchant-applications*') ? 'bg-red-50 text-red-600' : 'text-gray-700 hover:bg-gray-100' }}">

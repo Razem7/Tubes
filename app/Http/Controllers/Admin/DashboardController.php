@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Banner;
 use App\Models\Category;
 use App\Models\Chat;
 use App\Models\Product;
@@ -136,6 +137,53 @@ class DashboardController extends Controller
         $user->update(['role' => 'user']);
 
         return back()->with('success', $user->name . ' berhasil diubah menjadi User biasa!');
+    }
+
+    // ── Banner ────────────────────────────────────────────────────────────
+
+    public function banners()
+    {
+        $banner = Banner::first();
+
+        return view('admin.banners', compact('banner'));
+    }
+
+    public function storeBanner(Request $request)
+    {
+        $request->validate([
+            'title'    => 'nullable|string|max:100',
+            'image'    => 'required|image|mimes:jpeg,png,jpg,webp|max:3072',
+            'link_url' => 'nullable|url|max:255',
+        ]);
+
+        // Hapus banner lama jika ada
+        $existing = Banner::first();
+        if ($existing) {
+            \Storage::disk('public')->delete($existing->image_url);
+            $existing->delete();
+        }
+
+        $path = $request->file('image')->store('banners', 'public');
+
+        Banner::create([
+            'title'     => $request->title,
+            'image_url' => $path,
+            'link_url'  => $request->link_url,
+            'is_active' => true,
+        ]);
+
+        return back()->with('success', 'Banner berhasil disimpan!');
+    }
+
+    public function deleteBanner()
+    {
+        $banner = Banner::first();
+        if ($banner) {
+            \Storage::disk('public')->delete($banner->image_url);
+            $banner->delete();
+        }
+
+        return back()->with('success', 'Banner berhasil dihapus!');
     }
 
     // ── Categories ────────────────────────────────────────────────────────

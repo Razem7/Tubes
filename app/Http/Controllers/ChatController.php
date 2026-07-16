@@ -41,6 +41,12 @@ class ChatController extends Controller
             ->whereNull('read_at')
             ->update(['read_at' => now()]);
 
+        // Mark related chat notifications as read so the dot disappears
+        auth()->user()
+            ->unreadNotifications()
+            ->where('data->chat_id', $chat->id)
+            ->update(['read_at' => now()]);
+
         return view('chats.show', compact('chat'));
     }
 

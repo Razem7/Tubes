@@ -27,12 +27,13 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 
 // ── Public product listing ────────────────────────────────────────────────
 Route::get('/products',          [ProductController::class, 'index'])->name('products.index');
-Route::get('/products/{product}',[ProductController::class, 'show'])->name('products.show');
 
 // ── User biasa (beli, chat, favorit) — super_admin diblokir ──────────────
 Route::middleware(['auth', 'not_admin'])->group(function () {
 
     // Produk milik sendiri (user & merchant sama-sama bisa jual)
+    // PENTING: /products/create harus didaftarkan SEBELUM /products/{product}
+    // agar Laravel tidak menganggap "create" sebagai wildcard {product}
     Route::get('/products/create',          [ProductController::class, 'create'])->name('products.create');
     Route::post('/products',                [ProductController::class, 'store'])->name('products.store');
     Route::get('/my-products',              [ProductController::class, 'myProducts'])->name('products.my');
@@ -57,6 +58,9 @@ Route::middleware(['auth', 'not_admin'])->group(function () {
     Route::post('/products/{product}/favorite', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
 });
 
+// Detail produk (public) — didaftarkan SETELAH /products/create agar tidak konflik
+Route::get('/products/{product}',[ProductController::class, 'show'])->name('products.show');
+
 // ── Profile & Notifikasi (semua role boleh) ───────────────────────────────
 Route::middleware('auth')->group(function () {
     Route::get('/profile',       [ProfileController::class, 'show'])->name('profile.show');
@@ -64,6 +68,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile',       [ProfileController::class, 'update'])->name('profile.update');
 
     Route::get('/notifications',                   [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/unread-chats',      [NotificationController::class, 'unreadChats'])->name('notifications.unread-chats');
     Route::post('/notifications/{id}/read',        [NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::post('/notifications/read-all',         [NotificationController::class, 'markAllRead'])->name('notifications.read-all');
 
@@ -106,6 +111,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/categories',                  [AdminController::class, 'storeCategory'])->name('categories.store');
     Route::put('/categories/{category}',        [AdminController::class, 'updateCategory'])->name('categories.update');
     Route::delete('/categories/{category}',     [AdminController::class, 'deleteCategory'])->name('categories.delete');
+
+    // Banner
+    Route::get('/banners',              [AdminController::class, 'banners'])->name('banners');
+    Route::post('/banners',             [AdminController::class, 'storeBanner'])->name('banners.store');
+    Route::delete('/banners',           [AdminController::class, 'deleteBanner'])->name('banners.delete');
 
     // Pendaftaran Merchant
     Route::get('/merchant-applications',                          [MerchantApplicationController::class, 'adminIndex'])->name('merchant-applications.index');

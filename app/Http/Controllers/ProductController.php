@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Banner;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductPhoto;
@@ -67,10 +68,11 @@ class ProductController extends Controller
             $query->where('condition', $request->condition);
         }
 
-        $products = $query->paginate(20)->withQueryString();
+        $products   = $query->paginate(20)->withQueryString();
         $categories = Category::orderBy('name')->get();
+        $banners    = Banner::active()->get();
 
-        return view('products.index', compact('products', 'categories'));
+        return view('products.index', compact('products', 'categories', 'banners'));
     }
 
     public function show(Product $product)
