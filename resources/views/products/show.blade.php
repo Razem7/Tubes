@@ -80,8 +80,8 @@
             @endif
 
             {{-- Description (mobile & desktop, shown below photo on mobile, stays left col on desktop) --}}
-            <div class="mt-4 bg-white rounded-2xl border border-gray-200 shadow-sm p-5 hidden md:block">
-                <p class="font-semibold text-gray-900 mb-2" style="font-size:15px;">Deskripsi</p>
+            <div class="mt-4 bg-white rounded-2xl border border-gray-200 shadow-sm hidden md:block" style="padding: 20px 24px;">
+                <p class="font-semibold text-gray-900 mb-3" style="font-size:15px;">Deskripsi</p>
                 <p class="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{{ $product->description }}</p>
             </div>
         </div>
@@ -278,8 +278,8 @@
     </div>
 
     {{-- Description on mobile (shown below the grid) --}}
-    <div class="mt-4 bg-white rounded-2xl border border-gray-200 shadow-sm p-5 md:hidden">
-        <p class="font-semibold text-gray-900 mb-2" style="font-size:15px;">Deskripsi</p>
+    <div class="mt-4 bg-white rounded-2xl border border-gray-200 shadow-sm md:hidden" style="padding: 20px 24px;">
+        <p class="font-semibold text-gray-900 mb-3" style="font-size:15px;">Deskripsi</p>
         <p class="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{{ $product->description }}</p>
     </div>
 
