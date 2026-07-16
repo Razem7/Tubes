@@ -75,19 +75,23 @@
                             <div id="dropdown" class="hidden absolute right-0 mt-1 w-52 bg-white rounded-xl shadow-xl border border-gray-100 py-1" style="z-index:9999; top:100%;">
                                 @if(!auth()->user()->isSuperAdmin())
                                     @if(auth()->user()->isMerchant())
-                                        {{-- Merchant: link ke dashboard merchant --}}
+                                        {{-- Merchant --}}
                                         <a href="{{ route('merchant.dashboard') }}" class="flex items-center gap-2 px-4 py-2 text-sm text-purple-700 hover:bg-purple-50 font-medium">
                                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
                                             Dashboard Merchant
                                         </a>
                                         <div class="border-t border-gray-100 my-1"></div>
                                     @elseif(auth()->user()->isUser())
-                                        {{-- User biasa: link daftar merchant --}}
+                                        {{-- User biasa --}}
                                         <a href="{{ route('merchant.apply.create') }}" class="flex items-center gap-2 px-4 py-2 text-sm text-purple-700 hover:bg-purple-50 font-medium">
                                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"/><path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd"/></svg>
                                             Daftar jadi Merchant
                                         </a>
                                         <div class="border-t border-gray-100 my-1"></div>
+                                        <a href="{{ route('products.my') }}" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                                            Produk Saya
+                                        </a>
                                     @endif
                                     <a href="{{ route('favorites.index') }}" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                                         <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>

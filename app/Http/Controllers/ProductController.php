@@ -201,7 +201,7 @@ class ProductController extends Controller
             }
         }
 
-        return redirect()->route('products.show', $product)->with('success', 'Produk berhasil diupdate!');
+        return redirect()->route('products.my')->with('success', 'Produk berhasil diupdate!');
     }
 
     public function destroy(Product $product)
@@ -218,7 +218,7 @@ class ProductController extends Controller
 
         $product->delete();
 
-        return redirect()->route('products.index')->with('success', 'Produk berhasil dihapus!');
+        return redirect()->route('products.my')->with('success', 'Produk berhasil dihapus!');
     }
 
     public function myProducts()

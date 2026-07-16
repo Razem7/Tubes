@@ -141,7 +141,7 @@
                 <button type="submit" class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
                     Update Produk
                 </button>
-                <a href="{{ route('products.show', $product) }}" class="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400 text-center">
+                <a href="{{ route('products.my') }}" class="flex-1 bg-gray-100 text-gray-700 py-2 rounded-lg hover:bg-gray-200 text-center text-sm font-medium">
                     Batal
                 </a>
             </div>
