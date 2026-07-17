@@ -27,16 +27,33 @@ class NotificationController extends Controller
         return response()->json(['count' => $count]);
     }
 
+    // Jumlah transaksi yang butuh aksi dari user ini (untuk polling dot)
+    public function unreadTransactions()
+    {
+        $userId = auth()->id();
+
+        // Seller: transaksi pending yang belum dikonfirmasi
+        $pendingSeller = \App\Models\Transaction::where('seller_id', $userId)
+            ->where('status', \App\Models\Transaction::STATUS_PENDING)
+            ->count();
+
+        // Buyer: transaksi confirmed yang menunggu konfirmasi penerimaan dari buyer
+        $waitingBuyer = \App\Models\Transaction::where('buyer_id', $userId)
+            ->where('status', \App\Models\Transaction::STATUS_CONFIRMED)
+            ->count();
+
+        return response()->json(['count' => $pendingSeller + $waitingBuyer]);
+    }
+
     // Ambil notifikasi unread (untuk polling)
     public function index()
     {
         $userId = auth()->id();
 
-        // Ambil semua unread notifikasi
         $raw = auth()->user()->unreadNotifications()->latest()->take(50)->get();
+        $toMarkRead = collect();
 
-        // Untuk notifikasi new_message: skip jika chat-nya sudah tidak punya pesan unread
-        // (artinya user sudah buka chat tsb, messages sudah di-read, tapi notifnya belum di-mark)
+        // ── 1. new_message: mark-read jika chat sudah tidak punya pesan unread ──
         $readChatIds = \App\Models\Chat::where(function ($q) use ($userId) {
                 $q->where('buyer_id', $userId)->orWhere('seller_id', $userId);
             })
@@ -46,17 +63,48 @@ class NotificationController extends Controller
             ->pluck('id')
             ->toArray();
 
-        // Auto mark-read notif new_message yang chat-nya sudah dibaca
-        $toMarkRead = $raw->filter(function ($n) use ($readChatIds) {
-            if (($n->data['type'] ?? '') === 'new_message') {
+        // ── 2. Notif transaksi: mark-read jika transaksi sudah tidak butuh aksi ──
+        // Transaksi yang masih butuh aksi:
+        // - Seller: pending (belum konfirmasi)
+        // - Buyer: confirmed (belum konfirmasi terima)
+        $actionNeededTrxIds = \App\Models\Transaction::where(function ($q) use ($userId) {
+                // Seller menunggu konfirmasi
+                $q->where('seller_id', $userId)->where('status', \App\Models\Transaction::STATUS_PENDING);
+            })
+            ->orWhere(function ($q) use ($userId) {
+                // Buyer menunggu konfirmasi terima
+                $q->where('buyer_id', $userId)->where('status', \App\Models\Transaction::STATUS_CONFIRMED);
+            })
+            ->pluck('id')
+            ->toArray();
+
+        foreach ($raw as $n) {
+            $type = $n->data['type'] ?? '';
+
+            if ($type === 'new_message') {
                 $chatId = $n->data['chat_id'] ?? null;
-                return $chatId && in_array($chatId, $readChatIds);
+                if ($chatId && in_array($chatId, $readChatIds)) {
+                    $toMarkRead->push($n);
+                }
+            } elseif (in_array($type, [
+                'new_transaction',
+                'transaction_confirmed',
+                'transaction_rejected',
+                'transaction_completed',
+            ])) {
+                $trxId = $n->data['transaction_id'] ?? null;
+                // Mark-read jika transaksi ini tidak butuh aksi lagi
+                if ($trxId && ! in_array($trxId, $actionNeededTrxIds)) {
+                    $toMarkRead->push($n);
+                }
+            } else {
+                // Tipe tidak dikenal — langsung mark-read agar tidak timbul ghost dot
+                $toMarkRead->push($n);
             }
-            return false;
-        });
+        }
 
         if ($toMarkRead->isNotEmpty()) {
-            $toMarkRead->each->markAsRead();
+            $toMarkRead->unique('id')->each->markAsRead();
         }
 
         // Ambil ulang setelah auto-mark

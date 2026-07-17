@@ -42,10 +42,15 @@ Route::middleware(['auth', 'not_admin'])->group(function () {
     Route::delete('/products/{product}',    [ProductController::class, 'destroy'])->name('products.destroy');
 
     // Transaksi (hanya user biasa yang bisa beli)
-    Route::get('/products/{product}/checkout',  [TransactionController::class, 'checkout'])->name('products.checkout');
-    Route::post('/products/{product}/purchase', [TransactionController::class, 'purchase'])->name('products.purchase');
-    Route::get('/transactions',                 [TransactionController::class, 'index'])->name('transactions.index');
-    Route::get('/transactions/{transaction}',   [TransactionController::class, 'show'])->name('transactions.show');
+    Route::get('/products/{product}/checkout',   [TransactionController::class, 'checkout'])->name('products.checkout');
+    Route::post('/products/{product}/purchase',  [TransactionController::class, 'purchase'])->name('products.purchase');
+    Route::get('/transactions',                  [TransactionController::class, 'index'])->name('transactions.index');
+    Route::get('/transactions/{transaction}',    [TransactionController::class, 'show'])->name('transactions.show');
+    Route::patch('/transactions/{transaction}/confirm',  [TransactionController::class, 'confirm'])->name('transactions.confirm');
+    Route::patch('/transactions/{transaction}/reject',   [TransactionController::class, 'reject'])->name('transactions.reject');
+    Route::patch('/transactions/{transaction}/complete', [TransactionController::class, 'complete'])->name('transactions.complete');
+    Route::patch('/transactions/{transaction}/cancel',   [TransactionController::class, 'cancel'])->name('transactions.cancel');
+    Route::patch('/transactions/{transaction}/receive',  [TransactionController::class, 'receive'])->name('transactions.receive');
 
     // Chat
     Route::get('/chats',                        [ChatController::class, 'index'])->name('chats.index');
@@ -69,6 +74,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/notifications',                   [NotificationController::class, 'index'])->name('notifications.index');
     Route::get('/notifications/unread-chats',      [NotificationController::class, 'unreadChats'])->name('notifications.unread-chats');
+    Route::get('/notifications/unread-transactions',[NotificationController::class, 'unreadTransactions'])->name('notifications.unread-transactions');
     Route::post('/notifications/{id}/read',        [NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::post('/notifications/read-all',         [NotificationController::class, 'markAllRead'])->name('notifications.read-all');
 

@@ -108,8 +108,6 @@ class DashboardController extends Controller
             'location'       => 'required|string|max:255',
             'brand'          => 'nullable|string|max:50',
             'model'          => 'nullable|string|max:100',
-            'payment_methods'=> 'required|array|min:1',
-            'payment_methods.*' => 'in:cod,rekber',
             'photos'         => 'nullable|array|max:5',
             'photos.*'       => 'image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
@@ -125,7 +123,7 @@ class DashboardController extends Controller
             'location'        => $validated['location'],
             'brand'           => $validated['brand'] ?? null,
             'model'           => $validated['model'] ?? null,
-            'payment_methods' => implode(',', $validated['payment_methods']),
+            'payment_methods' => 'cod',
             'is_sold'         => false,
         ]);
 
@@ -165,8 +163,6 @@ class DashboardController extends Controller
             'location'       => 'required|string|max:255',
             'brand'          => 'nullable|string|max:50',
             'model'          => 'nullable|string|max:100',
-            'payment_methods'=> 'required|array|min:1',
-            'payment_methods.*' => 'in:cod,rekber',
             'photos'         => 'nullable|array|max:5',
             'photos.*'       => 'image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
@@ -181,7 +177,7 @@ class DashboardController extends Controller
             'location'        => $validated['location'],
             'brand'           => $validated['brand'] ?? null,
             'model'           => $validated['model'] ?? null,
-            'payment_methods' => implode(',', $validated['payment_methods']),
+            'payment_methods' => 'cod',
         ]);
 
         if ($request->hasFile('photos')) {

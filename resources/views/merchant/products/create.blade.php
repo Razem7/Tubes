@@ -111,24 +111,16 @@
 
         <!-- Sidebar -->
         <div class="space-y-5">
-            <!-- Payment -->
+            <!-- Metode Pembayaran (COD Only) -->
             <div class="bg-white rounded-xl shadow-sm p-6">
-                <h3 class="font-semibold text-gray-800 mb-4">Metode Pembayaran <span class="text-red-500">*</span></h3>
-                <div class="space-y-2">
-                    <label class="flex items-center gap-3 cursor-pointer">
-                        <input type="checkbox" name="payment_methods[]" value="cod"
-                               {{ in_array('cod', old('payment_methods', [])) ? 'checked' : '' }}
-                               class="w-4 h-4 text-purple-600 rounded">
-                        <span class="text-sm font-medium">COD (Bayar di tempat)</span>
-                    </label>
-                    <label class="flex items-center gap-3 cursor-pointer">
-                        <input type="checkbox" name="payment_methods[]" value="rekber"
-                               {{ in_array('rekber', old('payment_methods', [])) ? 'checked' : '' }}
-                               class="w-4 h-4 text-purple-600 rounded">
-                        <span class="text-sm font-medium">Rekening Bersama</span>
-                    </label>
+                <h3 class="font-semibold text-gray-800 mb-3">Metode Pembayaran</h3>
+                <div class="flex items-center gap-3 bg-green-50 border border-green-200 rounded-lg px-4 py-3">
+                    <svg class="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                    <div>
+                        <p class="text-sm font-semibold text-green-800">COD — Bayar di Tempat</p>
+                        <p class="text-xs text-green-600 mt-0.5">Pembeli membayar langsung saat barang diterima</p>
+                    </div>
                 </div>
-                @error('payment_methods')<p class="text-red-500 text-xs mt-2">{{ $message }}</p>@enderror
             </div>
 
             <!-- Submit -->

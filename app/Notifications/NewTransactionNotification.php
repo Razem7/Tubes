@@ -24,8 +24,8 @@ class NewTransactionNotification extends Notification
 
         return [
             'type'           => 'new_transaction',
-            'message'        => $buyer->name . ' membeli produk Anda: ' . $product->name,
-            'product_name'   => $product->name,
+            'message'        => $buyer->name . ' membeli produk Anda: ' . $product->title,
+            'product_name'   => $product->title,
             'buyer_name'     => $buyer->name,
             'amount'         => $this->transaction->amount,
             'transaction_id' => $this->transaction->id,

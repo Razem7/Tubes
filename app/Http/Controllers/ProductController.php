@@ -118,7 +118,7 @@ class ProductController extends Controller
             'model' => $validated['model'] ?? null,
             'condition' => $validated['condition'],
             'category_id' => $validated['category_id'],
-            'payment_methods' => 'cod,rekber',
+            'payment_methods' => 'cod',
         ]);
 
         // Upload photos

@@ -25,7 +25,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
                         </svg>
                     </div>
-                    <span class="text-xl font-extrabold tracking-tight text-blue-700">GadgetHub</span>
+                    <span class="text-xl font-light text-blue-700" style="letter-spacing: 0.04em;">GadgetHub</span>
                 </a>
 
                 <!-- Search bar (desktop) -->
@@ -51,6 +51,15 @@
                 <div class="hidden md:flex items-center gap-2 flex-shrink-0">
                     @auth
                         @if(!auth()->user()->is_admin)
+                            {{-- Tombol Chat di luar dropdown --}}
+                            <a href="{{ route('chats.index') }}"
+                               class="relative flex items-center gap-1 text-gray-600 hover:text-blue-600 hover:bg-gray-100 px-3 py-2 rounded-lg transition"
+                               title="Chat">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                                </svg>
+                                <span id="navbar-chat-dot" style="display:none; position:absolute; top:6px; right:6px; width:8px; height:8px; background:#ef4444; border:2px solid #fff; border-radius:50%;"></span>
+                            </a>
                             <a href="{{ route('products.create') }}" class="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -80,6 +89,10 @@
                                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
                                             Dashboard Merchant
                                         </a>
+                                        <a href="{{ route('merchant.sales') }}" class="flex items-center gap-2 px-4 py-2 text-sm text-purple-700 hover:bg-purple-50 font-medium">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm2 10a1 1 0 10-2 0v3a1 1 0 102 0v-3zm2-3a1 1 0 011 1v5a1 1 0 11-2 0v-5a1 1 0 011-1zm4-1a1 1 0 10-2 0v7a1 1 0 102 0V8z" clip-rule="evenodd"/></svg>
+                                            Data Penjualan
+                                        </a>
                                         <div class="border-t border-gray-100 my-1"></div>
                                     @elseif(auth()->user()->isUser())
                                         {{-- User biasa --}}
@@ -97,22 +110,14 @@
                                         <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
                                         Favorit
                                     </a>
-                                    <a href="{{ route('chats.index') }}" class="flex items-center justify-between px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                    {{-- Transaksi: user biasa bisa beli, merchant bisa kelola pesanan --}}
+                                    <a href="{{ route('transactions.index') }}" class="flex items-center justify-between px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                                         <span class="flex items-center gap-2">
-                                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-                                            Chat
+                                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                                            {{ auth()->user()->isMerchant() ? 'Pesanan Masuk' : 'Transaksi' }}
                                         </span>
-                                        <span id="chat-dot" style="display:none; width:10px; height:10px; background:#ef4444; border-radius:50%; flex-shrink:0;"></span>
+                                        <span id="transaction-dot" style="display:none; width:10px; height:10px; background:#ef4444; border-radius:50%; flex-shrink:0;"></span>
                                     </a>
-                                    @if(auth()->user()->isUser())
-                                        <a href="{{ route('transactions.index') }}" class="flex items-center justify-between px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                                            <span class="flex items-center gap-2">
-                                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                                                Transaksi
-                                            </span>
-                                            <span id="transaction-dot" style="display:none; width:10px; height:10px; background:#ef4444; border-radius:50%; flex-shrink:0;"></span>
-                                        </a>
-                                    @endif
                                     <div class="border-t border-gray-100 my-1"></div>
                                 @endif
                                 <a href="{{ route('profile.show') }}" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
@@ -217,7 +222,7 @@
                         </a>
                         <a href="{{ route('transactions.index') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700">
                             <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                            Transaksi
+                            {{ auth()->user()->isMerchant() ? 'Pesanan Masuk' : 'Transaksi' }}
                         </a>
                     @else
                         <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-blue-600">
@@ -358,72 +363,50 @@
 
         @auth
         // ── Notification polling ──────────────────────────────────────────
-        const NOTIF_URL        = '{{ route("notifications.index") }}';
-        const UNREAD_CHATS_URL = '{{ route("notifications.unread-chats") }}';
-        const NOTIF_READ_ALL   = '{{ route("notifications.read-all") }}';
-        const CSRF             = document.querySelector('meta[name="csrf-token"]').content;
+        const UNREAD_CHATS_URL  = '{{ route("notifications.unread-chats") }}';
+        const UNREAD_TRX_URL    = '{{ route("notifications.unread-transactions") }}';
+        const NOTIF_READ_ALL    = '{{ route("notifications.read-all") }}';
+        const CSRF              = document.querySelector('meta[name="csrf-token"]').content;
 
-        function renderNotifications(data) {
-            const profileDot     = document.getElementById('profile-dot');
-            const transactionDot = document.getElementById('transaction-dot');
-
-            const types          = data.notifications.map(n => n.type);
-            const hasTransaction = types.includes('new_transaction');
-
-            if (transactionDot) transactionDot.style.display = hasTransaction ? 'inline-block' : 'none';
-
-            // profile-dot: nyala jika ada notif apapun ATAU ada unread chat
-            updateProfileDot();
-        }
-
-        function updateChatDot(count) {
-            const chatDot = document.getElementById('chat-dot');
-            if (chatDot) chatDot.style.display = count > 0 ? 'inline-block' : 'none';
-        }
-
-        function updateProfileDot() {
-            // Ambil dari dua sumber: notifikasi unread + unread chat
+        function updateAllDots() {
             Promise.all([
-                fetch(NOTIF_URL,        { credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } }).then(r => r.ok ? r.json() : null),
                 fetch(UNREAD_CHATS_URL, { credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } }).then(r => r.ok ? r.json() : null),
-            ]).then(([notifData, chatData]) => {
-                const profileDot     = document.getElementById('profile-dot');
-                const transactionDot = document.getElementById('transaction-dot');
+                fetch(UNREAD_TRX_URL,   { credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } }).then(r => r.ok ? r.json() : null),
+            ]).then(([chatData, trxData]) => {
+                const chatCount = chatData?.count ?? 0;
+                const trxCount  = trxData?.count  ?? 0;
 
-                const notifCount  = notifData?.count  ?? 0;
-                const chatCount   = chatData?.count   ?? 0;
+                // Chat dot — nyala jika ada pesan belum dibaca
+                const chatDot = document.getElementById('navbar-chat-dot');
+                if (chatDot) chatDot.style.display = chatCount > 0 ? 'block' : 'none';
 
-                const types          = (notifData?.notifications ?? []).map(n => n.type);
-                const hasTransaction = types.includes('new_transaction');
+                // Transaction dot — nyala jika ada transaksi yang butuh aksi
+                const trxDot = document.getElementById('transaction-dot');
+                if (trxDot) trxDot.style.display = trxCount > 0 ? 'inline-block' : 'none';
 
-                if (transactionDot) transactionDot.style.display = hasTransaction ? 'inline-block' : 'none';
-                updateChatDot(chatCount);
-
-                if (profileDot) profileDot.style.display = (notifCount > 0 || chatCount > 0) ? 'block' : 'none';
+                // Profile dot — hanya nyala jika ada transaksi yang butuh aksi user
+                const profileDot = document.getElementById('profile-dot');
+                if (profileDot) profileDot.style.display = trxCount > 0 ? 'block' : 'none';
             }).catch(() => {});
-        }
-
-        function fetchNotifications() {
-            updateProfileDot();
         }
 
         function markAsRead(id) {
             fetch(`/notifications/${id}/read`, {
                 method: 'POST',
                 headers: { 'X-CSRF-TOKEN': CSRF, 'X-Requested-With': 'XMLHttpRequest' },
-            }).then(() => fetchNotifications()).catch(() => {});
+            }).then(() => updateAllDots()).catch(() => {});
         }
 
         function markAllRead() {
             fetch(NOTIF_READ_ALL, {
                 method: 'POST',
                 headers: { 'X-CSRF-TOKEN': CSRF, 'X-Requested-With': 'XMLHttpRequest' },
-            }).then(() => fetchNotifications()).catch(() => {});
+            }).then(() => updateAllDots()).catch(() => {});
         }
 
         // Polling setiap 15 detik
-        fetchNotifications();
-        setInterval(fetchNotifications, 15000);
+        updateAllDots();
+        setInterval(updateAllDots, 15000);
         @endauth
     </script>
 

@@ -79,7 +79,8 @@
                     <a href="{{ route('merchant.sales') }}"
                        class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('merchant.sales*') ? 'bg-purple-50 text-purple-700' : 'text-gray-700 hover:bg-gray-100' }}">
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm2 10a1 1 0 10-2 0v3a1 1 0 102 0v-3zm2-3a1 1 0 011 1v5a1 1 0 11-2 0v-5a1 1 0 011-1zm4-1a1 1 0 10-2 0v7a1 1 0 102 0V8z" clip-rule="evenodd"/></svg>
-                        Data Penjualan
+                        <span class="flex-1">Data Penjualan</span>
+                        <span id="sidebar-trx-badge" style="display:none;" class="bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center"></span>
                     </a>
                     <a href="{{ route('chats.index') }}"
                        class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('chats*') ? 'bg-purple-50 text-purple-700' : 'text-gray-700 hover:bg-gray-100' }}">
@@ -128,31 +129,34 @@
         });
 
         @auth
-        const NOTIF_URL        = '{{ route("notifications.index") }}';
         const UNREAD_CHATS_URL = '{{ route("notifications.unread-chats") }}';
+        const UNREAD_TRX_URL   = '{{ route("notifications.unread-transactions") }}';
         const CSRF             = document.querySelector('meta[name="csrf-token"]').content;
 
         function updateDots() {
             Promise.all([
-                fetch(NOTIF_URL,        { credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } }).then(r => r.ok ? r.json() : null),
                 fetch(UNREAD_CHATS_URL, { credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } }).then(r => r.ok ? r.json() : null),
-            ]).then(([notifData, chatData]) => {
-                const notifCount = notifData?.count ?? 0;
-                const chatCount  = chatData?.count  ?? 0;
+                fetch(UNREAD_TRX_URL,   { credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } }).then(r => r.ok ? r.json() : null),
+            ]).then(([chatData, trxData]) => {
+                const chatCount = chatData?.count ?? 0;
+                const trxCount  = trxData?.count  ?? 0;
 
-                // Profile dot di navbar: nyala jika ada notif apapun ATAU ada unread chat
+                // Profile dot: hanya nyala jika ada transaksi yang butuh aksi
                 const profileDot = document.getElementById('profile-dot');
-                if (profileDot) profileDot.style.display = (notifCount > 0 || chatCount > 0) ? 'block' : 'none';
+                if (profileDot) profileDot.style.display = trxCount > 0 ? 'block' : 'none';
 
                 // Badge chat di sidebar
-                const badge = document.getElementById('sidebar-chat-badge');
-                if (badge) {
-                    if (chatCount > 0) {
-                        badge.textContent = chatCount;
-                        badge.style.display = 'inline-block';
-                    } else {
-                        badge.style.display = 'none';
-                    }
+                const chatBadge = document.getElementById('sidebar-chat-badge');
+                if (chatBadge) {
+                    chatBadge.textContent    = chatCount;
+                    chatBadge.style.display  = chatCount > 0 ? 'inline-block' : 'none';
+                }
+
+                // Badge transaksi di sidebar (pesanan pending)
+                const trxBadge = document.getElementById('sidebar-trx-badge');
+                if (trxBadge) {
+                    trxBadge.textContent   = trxCount;
+                    trxBadge.style.display = trxCount > 0 ? 'inline-block' : 'none';
                 }
             }).catch(() => {});
         }
