@@ -59,9 +59,19 @@
                     <label class="block text-sm font-semibold text-gray-700 mb-1">
                         Alamat Pengiriman <span class="text-red-500">*</span>
                     </label>
+                    @php $profileAddress = auth()->user()->address; @endphp
+                    @if($profileAddress && !old('shipping_address'))
+                        <div class="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 mb-2 text-xs text-blue-700">
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/>
+                            </svg>
+                            Alamat diisi otomatis dari profil kamu.
+                            <a href="{{ route('profile.edit') }}" class="underline font-semibold">Ubah di profil</a>
+                        </div>
+                    @endif
                     <textarea name="shipping_address" rows="4"
                               placeholder="Contoh: Jl. Mawar No. 12, RT 03/RW 05, Kel. Sukamaju, Kec. Cimahi Tengah, Kota Cimahi, Jawa Barat 40522"
-                              class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none {{ $errors->has('shipping_address') ? 'border-red-400' : '' }}">{{ old('shipping_address') }}</textarea>
+                              class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none {{ $errors->has('shipping_address') ? 'border-red-400' : '' }}">{{ old('shipping_address', $profileAddress) }}</textarea>
                     @error('shipping_address')
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror

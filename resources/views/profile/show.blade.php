@@ -35,6 +35,13 @@
                 <p class="text-gray-900">{{ $user->phone_number ?? '-' }}</p>
             </div>
 
+            @if(! $user->isSuperAdmin())
+            <div>
+                <label class="text-gray-600 text-sm">Alamat</label>
+                <p class="text-gray-900">{{ $user->address ?? '-' }}</p>
+            </div>
+            @endif
+
             <div>
                 <label class="text-gray-600 text-sm">Bergabung Sejak</label>
                 <p class="text-gray-900">{{ $user->created_at->format('d F Y') }}</p>

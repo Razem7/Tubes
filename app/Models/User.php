@@ -17,6 +17,7 @@ class User extends Authenticatable
         'email',
         'password',
         'phone_number',
+        'address',
         'profile_photo_url',
         'phone_verified',
         'is_admin',
