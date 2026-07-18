@@ -12,19 +12,15 @@ class MerchantApplicationController extends Controller
         $this->middleware('auth');
     }
 
-    // ── User: form pendaftaran ─────────────────────────────────────────────
-
     public function create()
     {
         $user = auth()->user();
 
-        // Merchant aktif tidak perlu daftar lagi
         if ($user->isMerchant()) {
             return redirect()->route('merchant.dashboard')
                 ->with('error', 'Kamu sudah menjadi Merchant.');
         }
 
-        // Cek apakah sudah ada pendaftaran pending
         $existingPending = MerchantApplication::where('user_id', $user->id)
             ->where('status', 'pending')
             ->latest()
@@ -35,8 +31,6 @@ class MerchantApplicationController extends Controller
                 ->with('info', 'Kamu sudah memiliki pendaftaran yang sedang diproses.');
         }
 
-        // Jika ada aplikasi approved tapi user sudah di-demote ke user biasa,
-        // biarkan dia daftar ulang (tidak redirect ke status)
         return view('merchant.apply.create');
     }
 
@@ -49,48 +43,46 @@ class MerchantApplicationController extends Controller
         }
 
         $validated = $request->validate([
-            // Data diri
-            'owner_name'         => 'required|string|max:100',
-            'owner_nik'          => 'required|digits:16',
-            'owner_phone'        => 'required|string|max:20',
-            'owner_dob'          => 'required|date|before:-17 years',
-            'owner_address'      => 'required|string|max:255',
-            'owner_city'         => 'required|string|max:100',
-            'owner_province'     => 'required|string|max:100',
-            'id_card_photo'      => 'required|image|mimes:jpg,jpeg,png|max:2048',
-            // Data toko
-            'store_name'         => 'required|string|max:100',
-            'store_category'     => 'required|string|max:100',
-            'store_description'  => 'required|string|min:20|max:1000',
-            'store_address'      => 'required|string|max:255',
-            'store_city'         => 'required|string|max:100',
-            'store_province'     => 'required|string|max:100',
-            'store_phone'        => 'required|string|max:20',
-            'store_email'        => 'nullable|email|max:100',
-            'store_logo'         => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            // Legalitas
-            'npwp'               => 'nullable|string|max:20',
-            'npwp_photo'         => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'siup_nib'           => 'nullable|string|max:50',
-            'bank_name'          => 'required|string|max:50',
-            'bank_account_number'=> 'required|string|max:30',
-            'bank_account_name'  => 'required|string|max:100',
+            'owner_name' => 'required|string|max:100',
+            'owner_nik' => 'required|digits:16',
+            'owner_phone' => 'required|string|max:20',
+            'owner_dob' => 'required|date|before:-17 years',
+            'owner_address' => 'required|string|max:255',
+            'owner_city' => 'required|string|max:100',
+            'owner_province' => 'required|string|max:100',
+            'id_card_photo' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+            'store_name' => 'required|string|max:100',
+            'store_category' => 'required|string|max:100',
+            'store_description' => 'required|string|min:20|max:1000',
+            'store_address' => 'required|string|max:255',
+            'store_city' => 'required|string|max:100',
+            'store_province' => 'required|string|max:100',
+            'store_phone' => 'required|string|max:20',
+            'store_email' => 'nullable|email|max:100',
+            'store_logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'npwp' => 'nullable|string|max:20',
+            'npwp_photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'siup_nib' => 'nullable|string|max:50',
+            'bank_name' => 'required|string|max:50',
+            'bank_account_number' => 'required|string|max:30',
+            'bank_account_name' => 'required|string|max:100',
         ]);
 
-        // Upload file
         if ($request->hasFile('id_card_photo')) {
             $validated['id_card_photo'] = $request->file('id_card_photo')->store('merchant/ktp', 'public');
         }
+
         if ($request->hasFile('store_logo')) {
             $validated['store_logo'] = $request->file('store_logo')->store('merchant/logo', 'public');
         }
+
         if ($request->hasFile('npwp_photo')) {
             $validated['npwp_photo'] = $request->file('npwp_photo')->store('merchant/npwp', 'public');
         }
 
         MerchantApplication::create(array_merge($validated, [
             'user_id' => $user->id,
-            'status'  => 'pending',
+            'status' => 'pending',
         ]));
 
         return redirect()->route('merchant.apply.status')
@@ -106,8 +98,6 @@ class MerchantApplicationController extends Controller
         return view('merchant.apply.status', compact('application'));
     }
 
-    // ── Admin: review ──────────────────────────────────────────────────────
-
     public function adminIndex(Request $request)
     {
         $query = MerchantApplication::with('user');
@@ -119,7 +109,7 @@ class MerchantApplicationController extends Controller
         $applications = $query->latest()->paginate(20);
 
         $counts = [
-            'pending'  => MerchantApplication::where('status', 'pending')->count(),
+            'pending' => MerchantApplication::where('status', 'pending')->count(),
             'approved' => MerchantApplication::where('status', 'approved')->count(),
             'rejected' => MerchantApplication::where('status', 'rejected')->count(),
         ];
@@ -136,17 +126,16 @@ class MerchantApplicationController extends Controller
 
     public function approve(MerchantApplication $application)
     {
-        if (!$application->isPending()) {
+        if (! $application->isPending()) {
             return back()->with('error', 'Pendaftaran ini sudah diproses.');
         }
 
         $application->update([
-            'status'      => 'approved',
+            'status' => 'approved',
             'reviewed_by' => auth()->id(),
             'reviewed_at' => now(),
         ]);
 
-        // Upgrade user role ke merchant
         $application->user->update(['role' => 'merchant']);
 
         return back()->with('success', 'Pendaftaran disetujui! ' . $application->store_name . ' sekarang menjadi Merchant.');
@@ -154,7 +143,7 @@ class MerchantApplicationController extends Controller
 
     public function reject(Request $request, MerchantApplication $application)
     {
-        if (!$application->isPending()) {
+        if (! $application->isPending()) {
             return back()->with('error', 'Pendaftaran ini sudah diproses.');
         }
 
@@ -163,10 +152,10 @@ class MerchantApplicationController extends Controller
         ]);
 
         $application->update([
-            'status'           => 'rejected',
+            'status' => 'rejected',
             'rejection_reason' => $request->rejection_reason,
-            'reviewed_by'      => auth()->id(),
-            'reviewed_at'      => now(),
+            'reviewed_by' => auth()->id(),
+            'reviewed_at' => now(),
         ]);
 
         return back()->with('success', 'Pendaftaran ditolak.');

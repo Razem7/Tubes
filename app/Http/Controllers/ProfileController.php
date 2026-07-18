@@ -32,19 +32,18 @@ class ProfileController extends Controller
         $user = auth()->user();
 
         $rules = [
-            'name'          => 'required|string|max:255',
-            'phone_number'  => 'nullable|string|max:20',
+            'name' => 'required|string|max:255',
+            'phone_number' => 'nullable|string|max:20',
             'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
         ];
 
-        // Alamat hanya untuk user biasa & merchant
         if (! $user->isSuperAdmin()) {
             $rules['address'] = 'nullable|string|max:1000';
         }
 
         $validated = $request->validate($rules);
 
-        $user->name         = $validated['name'];
+        $user->name = $validated['name'];
         $user->phone_number = $validated['phone_number'] ?? null;
 
         if (! $user->isSuperAdmin()) {
@@ -52,12 +51,10 @@ class ProfileController extends Controller
         }
 
         if ($request->hasFile('profile_photo')) {
-            // Delete old photo
             if ($user->profile_photo_url) {
                 Storage::disk('public')->delete($user->profile_photo_url);
             }
 
-            // Upload new photo
             $path = $request->file('profile_photo')->store('profiles', 'public');
             $user->profile_photo_url = $path;
         }
@@ -72,16 +69,15 @@ class ProfileController extends Controller
         $user = auth()->user();
 
         $request->validate([
-            'current_password'      => 'required|string',
-            'new_password'          => 'required|string|min:8|confirmed',
+            'current_password' => 'required|string',
+            'new_password' => 'required|string|min:8|confirmed',
         ], [
             'current_password.required' => 'Password saat ini wajib diisi.',
-            'new_password.required'     => 'Password baru wajib diisi.',
-            'new_password.min'          => 'Password baru minimal 8 karakter.',
-            'new_password.confirmed'    => 'Konfirmasi password baru tidak cocok.',
+            'new_password.required' => 'Password baru wajib diisi.',
+            'new_password.min' => 'Password baru minimal 8 karakter.',
+            'new_password.confirmed' => 'Konfirmasi password baru tidak cocok.',
         ]);
 
-        // Verifikasi password lama
         if (! Hash::check($request->current_password, $user->password)) {
             return back()
                 ->withErrors(['current_password' => 'Password saat ini tidak sesuai.'])

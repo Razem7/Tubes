@@ -28,20 +28,17 @@ class ChatController extends Controller
 
     public function show(Chat $chat)
     {
-        // Ensure user is part of this chat
         if ($chat->buyer_id !== auth()->id() && $chat->seller_id !== auth()->id()) {
             abort(403);
         }
 
         $chat->load(['product.photos', 'buyer', 'seller', 'messages.sender']);
 
-        // Mark messages as read
         $chat->messages()
             ->where('sender_id', '!=', auth()->id())
             ->whereNull('read_at')
             ->update(['read_at' => now()]);
 
-        // Mark related chat notifications as read so the dot disappears
         auth()->user()
             ->unreadNotifications()
             ->where('data->chat_id', $chat->id)
@@ -52,12 +49,10 @@ class ChatController extends Controller
 
     public function startChat(Product $product)
     {
-        // Cannot chat with yourself
         if ($product->user_id === auth()->id()) {
             return back()->with('error', 'Anda tidak bisa chat dengan diri sendiri!');
         }
 
-        // Find or create chat
         $chat = Chat::firstOrCreate([
             'product_id' => $product->id,
             'buyer_id' => auth()->id(),
@@ -69,7 +64,6 @@ class ChatController extends Controller
 
     public function sendMessage(Request $request, Chat $chat)
     {
-        // Ensure user is part of this chat
         if ($chat->buyer_id !== auth()->id() && $chat->seller_id !== auth()->id()) {
             abort(403);
         }
@@ -84,9 +78,8 @@ class ChatController extends Controller
             'message_text' => $validated['message'],
         ]);
 
-        $chat->touch(); // Update chat's updated_at timestamp
+        $chat->touch();
 
-        // Kirim notifikasi ke penerima (lawan bicara)
         $recipientId = $chat->buyer_id === auth()->id() ? $chat->seller_id : $chat->buyer_id;
         $recipient = \App\Models\User::find($recipientId);
         if ($recipient) {

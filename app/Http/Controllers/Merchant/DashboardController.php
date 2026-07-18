@@ -8,8 +8,8 @@ use App\Models\Chat;
 use App\Models\Product;
 use App\Models\ProductPhoto;
 use App\Models\Transaction;
-use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class DashboardController extends Controller
@@ -21,19 +21,17 @@ class DashboardController extends Controller
         $this->middleware(['auth', 'merchant']);
     }
 
-    // ── Dashboard ─────────────────────────────────────────────────────────
-
     public function index()
     {
         $user = auth()->user();
 
         $stats = [
             'total_products' => Product::where('user_id', $user->id)->count(),
-            'total_sold'     => Product::where('user_id', $user->id)->where('is_sold', true)->count(),
-            'total_active'   => Product::where('user_id', $user->id)->where('is_sold', false)->count(),
-            'total_revenue'  => Transaction::where('seller_id', $user->id)
-                                    ->where('status', '!=', 'cancelled')
-                                    ->sum('amount'),
+            'total_sold' => Product::where('user_id', $user->id)->where('is_sold', true)->count(),
+            'total_active' => Product::where('user_id', $user->id)->where('is_sold', false)->count(),
+            'total_revenue' => Transaction::where('seller_id', $user->id)
+                ->where('status', '!=', 'cancelled')
+                ->sum('amount'),
         ];
 
         $recent_products = Product::where('user_id', $user->id)
@@ -48,13 +46,12 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        // Chat terbaru dan unread count untuk merchant
         $recent_chats = Chat::where('seller_id', $user->id)
             ->with([
                 'product',
                 'buyer',
                 'latestMessage',
-                'messages' => fn($q) => $q->where('sender_id', '!=', $user->id)->whereNull('read_at'),
+                'messages' => fn ($q) => $q->where('sender_id', '!=', $user->id)->whereNull('read_at'),
             ])
             ->latest('updated_at')
             ->take(5)
@@ -68,8 +65,6 @@ class DashboardController extends Controller
 
         return view('merchant.dashboard', compact('stats', 'recent_products', 'recent_sales', 'recent_chats', 'unread_chats'));
     }
-
-    // ── Products ──────────────────────────────────────────────────────────
 
     public function products(Request $request)
     {
@@ -99,32 +94,32 @@ class DashboardController extends Controller
     public function storeProduct(Request $request)
     {
         $validated = $request->validate([
-            'title'          => 'required|string|min:5|max:100',
-            'description'    => 'required|string|min:10|max:2000',
-            'price'          => 'required|numeric|min:1|integer',
-            'stock'          => 'required|integer|min:1',
-            'category_id'    => 'required|exists:categories,id',
-            'condition'      => 'required|in:new,like_new,good,fair',
-            'location'       => 'required|string|max:255',
-            'brand'          => 'nullable|string|max:50',
-            'model'          => 'nullable|string|max:100',
-            'photos'         => 'nullable|array|max:5',
-            'photos.*'       => 'image|mimes:jpg,jpeg,png,webp|max:2048',
+            'title' => 'required|string|min:5|max:100',
+            'description' => 'required|string|min:10|max:2000',
+            'price' => 'required|numeric|min:1|integer',
+            'stock' => 'required|integer|min:1',
+            'category_id' => 'required|exists:categories,id',
+            'condition' => 'required|in:new,like_new,good,fair',
+            'location' => 'required|string|max:255',
+            'brand' => 'nullable|string|max:50',
+            'model' => 'nullable|string|max:100',
+            'photos' => 'nullable|array|max:5',
+            'photos.*' => 'image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
         $product = Product::create([
-            'user_id'         => auth()->id(),
-            'title'           => $validated['title'],
-            'description'     => $validated['description'],
-            'price'           => $validated['price'],
-            'stock'           => $validated['stock'],
-            'category_id'     => $validated['category_id'],
-            'condition'       => $validated['condition'],
-            'location'        => $validated['location'],
-            'brand'           => $validated['brand'] ?? null,
-            'model'           => $validated['model'] ?? null,
+            'user_id' => auth()->id(),
+            'title' => $validated['title'],
+            'description' => $validated['description'],
+            'price' => $validated['price'],
+            'stock' => $validated['stock'],
+            'category_id' => $validated['category_id'],
+            'condition' => $validated['condition'],
+            'location' => $validated['location'],
+            'brand' => $validated['brand'] ?? null,
+            'model' => $validated['model'] ?? null,
             'payment_methods' => 'cod',
-            'is_sold'         => false,
+            'is_sold' => false,
         ]);
 
         if ($request->hasFile('photos')) {
@@ -132,7 +127,7 @@ class DashboardController extends Controller
                 $path = $photo->store('products', 'public');
                 ProductPhoto::create([
                     'product_id' => $product->id,
-                    'photo_url'  => $path,
+                    'photo_url' => $path,
                 ]);
             }
         }
@@ -154,43 +149,43 @@ class DashboardController extends Controller
         $this->authorize('update', $product);
 
         $validated = $request->validate([
-            'title'          => 'required|string|min:5|max:100',
-            'description'    => 'required|string|min:10|max:2000',
-            'price'          => 'required|numeric|min:1|integer',
-            'stock'          => 'required|integer|min:0',
-            'category_id'    => 'required|exists:categories,id',
-            'condition'      => 'required|in:new,like_new,good,fair',
-            'location'       => 'required|string|max:255',
-            'brand'          => 'nullable|string|max:50',
-            'model'          => 'nullable|string|max:100',
-            'photos'         => 'nullable|array|max:5',
-            'photos.*'       => 'image|mimes:jpg,jpeg,png,webp|max:2048',
+            'title' => 'required|string|min:5|max:100',
+            'description' => 'required|string|min:10|max:2000',
+            'price' => 'required|numeric|min:1|integer',
+            'stock' => 'required|integer|min:0',
+            'category_id' => 'required|exists:categories,id',
+            'condition' => 'required|in:new,like_new,good,fair',
+            'location' => 'required|string|max:255',
+            'brand' => 'nullable|string|max:50',
+            'model' => 'nullable|string|max:100',
+            'photos' => 'nullable|array|max:5',
+            'photos.*' => 'image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
         $product->update([
-            'title'           => $validated['title'],
-            'description'     => $validated['description'],
-            'price'           => $validated['price'],
-            'stock'           => $validated['stock'],
-            'category_id'     => $validated['category_id'],
-            'condition'       => $validated['condition'],
-            'location'        => $validated['location'],
-            'brand'           => $validated['brand'] ?? null,
-            'model'           => $validated['model'] ?? null,
+            'title' => $validated['title'],
+            'description' => $validated['description'],
+            'price' => $validated['price'],
+            'stock' => $validated['stock'],
+            'category_id' => $validated['category_id'],
+            'condition' => $validated['condition'],
+            'location' => $validated['location'],
+            'brand' => $validated['brand'] ?? null,
+            'model' => $validated['model'] ?? null,
             'payment_methods' => 'cod',
         ]);
 
         if ($request->hasFile('photos')) {
             foreach ($product->photos as $old) {
-                // getRawOriginal() ambil nilai mentah dari DB tanpa getter
                 Storage::disk('public')->delete($old->getRawOriginal('photo_url'));
                 $old->delete();
             }
+
             foreach ($request->file('photos') as $photo) {
                 $path = $photo->store('products', 'public');
                 ProductPhoto::create([
                     'product_id' => $product->id,
-                    'photo_url'  => $path,
+                    'photo_url' => $path,
                 ]);
             }
         }
@@ -206,12 +201,11 @@ class DashboardController extends Controller
             Storage::disk('public')->delete($photo->getRawOriginal('photo_url'));
             $photo->delete();
         }
+
         $product->delete();
 
         return back()->with('success', 'Produk berhasil dihapus!');
     }
-
-    // ── Stock ─────────────────────────────────────────────────────────────
 
     public function stock(Request $request)
     {
@@ -234,14 +228,12 @@ class DashboardController extends Controller
         $request->validate(['stock' => 'required|integer|min:0']);
 
         $product->update([
-            'stock'   => $request->stock,
+            'stock' => $request->stock,
             'is_sold' => $request->stock == 0,
         ]);
 
         return back()->with('success', 'Stok berhasil diperbarui!');
     }
-
-    // ── Sales ─────────────────────────────────────────────────────────────
 
     public function sales(Request $request)
     {
@@ -255,9 +247,9 @@ class DashboardController extends Controller
         $transactions = $query->latest()->paginate(20);
 
         $summary = [
-            'total'    => Transaction::where('seller_id', auth()->id())->count(),
-            'pending'  => Transaction::where('seller_id', auth()->id())->where('status', 'pending')->count(),
-            'revenue'  => Transaction::where('seller_id', auth()->id())->where('status', '!=', 'cancelled')->sum('amount'),
+            'total' => Transaction::where('seller_id', auth()->id())->count(),
+            'pending' => Transaction::where('seller_id', auth()->id())->where('status', 'pending')->count(),
+            'revenue' => Transaction::where('seller_id', auth()->id())->where('status', '!=', 'cancelled')->sum('amount'),
         ];
 
         return view('merchant.sales', compact('transactions', 'summary'));

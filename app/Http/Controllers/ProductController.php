@@ -31,7 +31,6 @@ class ProductController extends Controller
             }]);
         }
 
-        // Search by keyword
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -40,37 +39,33 @@ class ProductController extends Controller
             });
         }
 
-        // Filter by location
         if ($request->filled('location')) {
             $query->where('location', 'like', "%{$request->location}%");
         }
 
-        // Filter by price range
         if ($request->filled('min_price')) {
             $query->where('price', '>=', $request->min_price);
         }
+
         if ($request->filled('max_price')) {
             $query->where('price', '<=', $request->max_price);
         }
 
-        // Filter by brand
         if ($request->filled('brand')) {
             $query->where('brand', $request->brand);
         }
 
-        // Filter by category
         if ($request->filled('category_id')) {
             $query->where('category_id', $request->category_id);
         }
 
-        // Filter by condition
         if ($request->filled('condition')) {
             $query->where('condition', $request->condition);
         }
 
-        $products   = $query->paginate(20)->withQueryString();
+        $products = $query->paginate(20)->withQueryString();
         $categories = Category::orderBy('name')->get();
-        $banners    = Banner::active()->get();
+        $banners = Banner::active()->get();
 
         return view('products.index', compact('products', 'categories', 'banners'));
     }
@@ -121,7 +116,6 @@ class ProductController extends Controller
             'payment_methods' => 'cod',
         ]);
 
-        // Upload photos
         foreach ($request->file('photos') as $index => $photo) {
             $path = $photo->store('products', 'public');
             ProductPhoto::create([
@@ -174,21 +168,19 @@ class ProductController extends Controller
             'category_id' => $validated['category_id'],
         ]);
 
-        // Delete selected photos
         if ($request->filled('delete_photos')) {
             $photosToDelete = ProductPhoto::whereIn('id', $request->delete_photos)
                 ->where('product_id', $product->id)
                 ->get();
 
             foreach ($photosToDelete as $photo) {
-                if (!empty($photo->photo_url)) {
+                if (! empty($photo->photo_url)) {
                     Storage::disk('public')->delete($photo->photo_url);
                 }
                 $photo->delete();
             }
         }
 
-        // Upload new photos
         if ($request->hasFile('new_photos')) {
             $maxOrder = $product->photos()->max('display_order') ?? -1;
             foreach ($request->file('new_photos') as $index => $photo) {
@@ -208,9 +200,8 @@ class ProductController extends Controller
     {
         $this->authorize('delete', $product);
 
-        // Delete all photos
         foreach ($product->photos as $photo) {
-            if (!empty($photo->photo_url)) {
+            if (! empty($photo->photo_url)) {
                 Storage::disk('public')->delete($photo->photo_url);
             }
             $photo->delete();

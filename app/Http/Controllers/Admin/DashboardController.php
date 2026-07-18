@@ -16,12 +16,12 @@ class DashboardController extends Controller
     public function index()
     {
         $stats = [
-            'total_users'     => User::where('role', 'user')->count(),
+            'total_users' => User::where('role', 'user')->count(),
             'total_merchants' => User::where('role', 'merchant')->count(),
-            'total_products'  => Product::count(),
-            'total_sold'      => Product::where('is_sold', true)->count(),
-            'total_chats'     => Chat::count(),
-            'total_revenue'   => Transaction::where('status', '!=', 'cancelled')->sum('amount'),
+            'total_products' => Product::count(),
+            'total_sold' => Product::where('is_sold', true)->count(),
+            'total_chats' => Chat::count(),
+            'total_revenue' => Transaction::where('status', '!=', 'cancelled')->sum('amount'),
         ];
 
         $recent_products = Product::with(['user', 'photos'])
@@ -37,8 +37,6 @@ class DashboardController extends Controller
         return view('admin.dashboard', compact('stats', 'recent_products', 'recent_users'));
     }
 
-    // ── Products ──────────────────────────────────────────────────────────
-
     public function products(Request $request)
     {
         $query = Product::with(['user', 'photos', 'category']);
@@ -47,12 +45,12 @@ class DashboardController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
         if ($request->filled('role')) {
-            $query->whereHas('user', fn($q) => $q->where('role', $request->role));
+            $query->whereHas('user', fn ($q) => $q->where('role', $request->role));
         }
 
         $products = $query->latest()->paginate(20);
@@ -63,17 +61,16 @@ class DashboardController extends Controller
     public function deleteProduct(Product $product)
     {
         foreach ($product->photos as $photo) {
-            if (!empty($photo->photo_url)) {
+            if (! empty($photo->photo_url)) {
                 \Storage::disk('public')->delete($photo->photo_url);
             }
             $photo->delete();
         }
+
         $product->delete();
 
         return back()->with('success', 'Produk berhasil dihapus!');
     }
-
-    // ── Users ─────────────────────────────────────────────────────────────
 
     public function users(Request $request)
     {
@@ -83,7 +80,7 @@ class DashboardController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
@@ -104,7 +101,7 @@ class DashboardController extends Controller
 
         foreach ($user->products as $product) {
             foreach ($product->photos as $photo) {
-                if (!empty($photo->photo_url)) {
+                if (! empty($photo->photo_url)) {
                     \Storage::disk('public')->delete($photo->photo_url);
                 }
                 $photo->delete();
@@ -119,7 +116,7 @@ class DashboardController extends Controller
 
     public function promoteToMerchant(User $user)
     {
-        if (!$user->isUser()) {
+        if (! $user->isUser()) {
             return back()->with('error', 'Hanya user biasa yang bisa dipromosikan ke Merchant.');
         }
 
@@ -130,7 +127,7 @@ class DashboardController extends Controller
 
     public function demoteToUser(User $user)
     {
-        if (!$user->isMerchant()) {
+        if (! $user->isMerchant()) {
             return back()->with('error', 'User ini bukan Merchant.');
         }
 
@@ -138,8 +135,6 @@ class DashboardController extends Controller
 
         return back()->with('success', $user->name . ' berhasil diubah menjadi User biasa!');
     }
-
-    // ── Banner ────────────────────────────────────────────────────────────
 
     public function banners()
     {
@@ -151,12 +146,11 @@ class DashboardController extends Controller
     public function storeBanner(Request $request)
     {
         $request->validate([
-            'title'    => 'nullable|string|max:100',
-            'image'    => 'required|image|mimes:jpeg,png,jpg,webp|max:3072',
+            'title' => 'nullable|string|max:100',
+            'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:3072',
             'link_url' => 'nullable|url|max:255',
         ]);
 
-        // Hapus banner lama jika ada
         $existing = Banner::first();
         if ($existing) {
             \Storage::disk('public')->delete($existing->image_url);
@@ -166,9 +160,9 @@ class DashboardController extends Controller
         $path = $request->file('image')->store('banners', 'public');
 
         Banner::create([
-            'title'     => $request->title,
+            'title' => $request->title,
             'image_url' => $path,
-            'link_url'  => $request->link_url,
+            'link_url' => $request->link_url,
             'is_active' => true,
         ]);
 
@@ -185,8 +179,6 @@ class DashboardController extends Controller
 
         return back()->with('success', 'Banner berhasil dihapus!');
     }
-
-    // ── Categories ────────────────────────────────────────────────────────
 
     public function categories()
     {
