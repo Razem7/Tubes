@@ -89,10 +89,6 @@
                                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
                                             Dashboard Merchant
                                         </a>
-                                        <a href="{{ route('merchant.sales') }}" class="flex items-center gap-2 px-4 py-2 text-sm text-purple-700 hover:bg-purple-50 font-medium">
-                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm2 10a1 1 0 10-2 0v3a1 1 0 102 0v-3zm2-3a1 1 0 011 1v5a1 1 0 11-2 0v-5a1 1 0 011-1zm4-1a1 1 0 10-2 0v7a1 1 0 102 0V8z" clip-rule="evenodd"/></svg>
-                                            Data Penjualan
-                                        </a>
                                         <div class="border-t border-gray-100 my-1"></div>
                                     @elseif(auth()->user()->isUser())
                                         {{-- User biasa --}}
@@ -287,7 +283,7 @@
     <footer class="bg-gray-800 text-white mt-8 py-4">
         <div class="max-w-screen-xl mx-auto px-4">
             <div class="flex justify-center items-center">
-                <p class="text-xs text-gray-400">&copy; 2025 GadgetHub. Platform jual beli gadget bekas terpercaya.</p>
+                <p class="text-xs text-gray-400">&copy; 2026 GadgetHub. Platform jual beli gadget bekas terpercaya.</p>
             </div>
         </div>
     </footer>

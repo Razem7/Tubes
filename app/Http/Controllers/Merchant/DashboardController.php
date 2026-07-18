@@ -132,7 +132,7 @@ class DashboardController extends Controller
                 $path = $photo->store('products', 'public');
                 ProductPhoto::create([
                     'product_id' => $product->id,
-                    'photo_url'  => 'storage/' . $path,
+                    'photo_url'  => $path,
                 ]);
             }
         }
@@ -182,14 +182,15 @@ class DashboardController extends Controller
 
         if ($request->hasFile('photos')) {
             foreach ($product->photos as $old) {
-                Storage::disk('public')->delete(str_replace('storage/', '', $old->photo_url));
+                // getRawOriginal() ambil nilai mentah dari DB tanpa getter
+                Storage::disk('public')->delete($old->getRawOriginal('photo_url'));
                 $old->delete();
             }
             foreach ($request->file('photos') as $photo) {
                 $path = $photo->store('products', 'public');
                 ProductPhoto::create([
                     'product_id' => $product->id,
-                    'photo_url'  => 'storage/' . $path,
+                    'photo_url'  => $path,
                 ]);
             }
         }
@@ -202,7 +203,7 @@ class DashboardController extends Controller
         $this->authorize('delete', $product);
 
         foreach ($product->photos as $photo) {
-            Storage::disk('public')->delete(str_replace('storage/', '', $photo->photo_url));
+            Storage::disk('public')->delete($photo->getRawOriginal('photo_url'));
             $photo->delete();
         }
         $product->delete();

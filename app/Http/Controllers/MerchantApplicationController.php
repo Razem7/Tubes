@@ -24,17 +24,19 @@ class MerchantApplicationController extends Controller
                 ->with('error', 'Kamu sudah menjadi Merchant.');
         }
 
-        // Cek apakah sudah ada pendaftaran pending/approved
-        $existing = MerchantApplication::where('user_id', $user->id)
-            ->whereIn('status', ['pending', 'approved'])
+        // Cek apakah sudah ada pendaftaran pending
+        $existingPending = MerchantApplication::where('user_id', $user->id)
+            ->where('status', 'pending')
             ->latest()
             ->first();
 
-        if ($existing) {
+        if ($existingPending) {
             return redirect()->route('merchant.apply.status')
                 ->with('info', 'Kamu sudah memiliki pendaftaran yang sedang diproses.');
         }
 
+        // Jika ada aplikasi approved tapi user sudah di-demote ke user biasa,
+        // biarkan dia daftar ulang (tidak redirect ke status)
         return view('merchant.apply.create');
     }
 
