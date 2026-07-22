@@ -1,67 +1,105 @@
 @extends('layouts.merchant')
-
-@section('title', 'Manajemen Stok - Merchant GadgetHub')
+@section('title', 'Manajemen Stok — Merchant GadgetHub')
 
 @section('content')
-<div class="mb-6">
-    <h2 class="text-2xl font-bold text-gray-800">Manajemen Stok</h2>
-    <p class="text-sm text-gray-500 mt-1">Update stok produk kamu</p>
+
+{{-- Header --}}
+<div class="mb-7 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+        <p class="section-eyebrow">Inventori</p>
+        <h1 class="text-2xl font-extrabold tracking-tight text-slate-900">Manajemen Stok</h1>
+        <p class="mt-0.5 text-sm text-slate-500">Update jumlah stok setiap produkmu</p>
+    </div>
+    <a href="{{ route('merchant.products.create') }}" class="btn-merchant self-start">
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+        </svg>
+        Tambah Produk
+    </a>
 </div>
 
-<!-- Filter -->
-<div class="bg-white rounded-xl shadow-sm p-4 mb-6">
-    <form action="{{ route('merchant.stock') }}" method="GET" class="flex gap-2">
-        <input type="text" name="search" value="{{ request('search') }}"
-               placeholder="Cari produk..."
-               class="flex-1 px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
-        <button type="submit" class="bg-purple-600 text-white px-5 py-2 rounded-lg text-sm hover:bg-purple-700">Cari</button>
-        <a href="{{ route('merchant.stock') }}" class="bg-gray-200 text-gray-700 px-5 py-2 rounded-lg text-sm hover:bg-gray-300">Reset</a>
+{{-- Filter --}}
+<div class="card mb-6 p-4">
+    <form action="{{ route('merchant.stock') }}" method="GET"
+          class="flex flex-wrap items-center gap-3">
+        <div class="relative flex-1 min-w-[180px]">
+            <div class="pointer-events-none absolute inset-y-0 left-3.5 flex items-center text-slate-400">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/>
+                </svg>
+            </div>
+            <input type="text" name="search" value="{{ request('search') }}"
+                   placeholder="Cari produk…"
+                   class="input-field py-2.5 pl-10">
+        </div>
+        <button type="submit" class="btn-merchant py-2.5 px-5 text-sm">Cari</button>
+        @if(request('search'))
+        <a href="{{ route('merchant.stock') }}" class="btn-secondary py-2.5 px-4 text-sm">Reset</a>
+        @endif
     </form>
 </div>
 
-<div class="bg-white rounded-xl shadow-sm overflow-hidden">
+{{-- Table --}}
+<div class="card overflow-hidden">
     <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-100">
-            <thead class="bg-gray-50">
+        <table class="data-table">
+            <thead>
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Produk</th>
-                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Harga</th>
-                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Stok Saat Ini</th>
-                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Status</th>
-                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Update Stok</th>
+                    <th class="pl-5">Produk</th>
+                    <th>Harga</th>
+                    <th>Stok</th>
+                    <th>Status</th>
+                    <th class="pr-5">Update Stok</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-50">
+            <tbody>
                 @forelse($products as $product)
-                <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4">
+                @php $photo = $product->photos->first(); @endphp
+                <tr>
+                    <td class="pl-5">
                         <div class="flex items-center gap-3">
-                            <img src="{{ $product->photos->first() ? asset($product->photos->first()->photo_url) : 'https://via.placeholder.com/40' }}"
-                                 class="w-10 h-10 rounded-lg object-cover flex-shrink-0">
-                            <div>
-                                <p class="text-sm font-medium text-gray-800">{{ Str::limit($product->title, 40) }}</p>
-                                <p class="text-xs text-gray-400">{{ $product->category->name ?? '-' }}</p>
+                            <div class="h-11 w-11 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
+                                @if($photo && $photo->photo_url)
+                                    <img src="{{ $photo->photo_url }}"
+                                         class="h-full w-full object-cover"
+                                         onerror="this.style.display='none'">
+                                @endif
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-sm font-semibold text-slate-800 truncate max-w-[200px]">
+                                    {{ $product->title }}
+                                </p>
+                                <p class="text-xs text-slate-400">{{ $product->category->name ?? '—' }}</p>
                             </div>
                         </div>
                     </td>
-                    <td class="px-6 py-4 text-sm text-gray-700">Rp {{ number_format($product->price, 0, ',', '.') }}</td>
-                    <td class="px-6 py-4">
-                        <span class="text-lg font-bold {{ ($product->stock ?? 0) <= 0 ? 'text-red-500' : 'text-gray-800' }}">
+                    <td class="whitespace-nowrap text-sm font-medium text-slate-700">
+                        Rp {{ number_format($product->price, 0, ',', '.') }}
+                    </td>
+                    <td>
+                        <span class="text-lg font-extrabold
+                            {{ ($product->stock ?? 0) <= 0 ? 'text-rose-500' : (($product->stock ?? 0) <= 3 ? 'text-amber-500' : 'text-slate-800') }}">
                             {{ $product->stock ?? 0 }}
                         </span>
+                        @if(($product->stock ?? 0) <= 3 && ($product->stock ?? 0) > 0)
+                        <span class="ml-1 text-[10px] font-bold text-amber-500">hampir habis</span>
+                        @elseif(($product->stock ?? 0) <= 0)
+                        <span class="ml-1 text-[10px] font-bold text-rose-500">kosong</span>
+                        @endif
                     </td>
-                    <td class="px-6 py-4">
-                        <span class="text-xs font-semibold px-2.5 py-1 rounded-full
-                            {{ $product->is_sold ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-700' }}">
-                            {{ $product->is_sold ? 'Habis/Terjual' : 'Aktif' }}
+                    <td>
+                        <span class="badge {{ $product->is_sold ? 'badge-red' : 'badge-emerald' }}">
+                            {{ $product->is_sold ? 'Terjual' : 'Aktif' }}
                         </span>
                     </td>
-                    <td class="px-6 py-4">
-                        <form action="{{ route('merchant.stock.update', $product) }}" method="POST" class="flex items-center gap-2">
+                    <td class="pr-5">
+                        <form action="{{ route('merchant.stock.update', $product) }}" method="POST"
+                              class="flex items-center gap-2">
                             @csrf @method('PATCH')
                             <input type="number" name="stock" value="{{ $product->stock ?? 0 }}" min="0"
-                                   class="w-20 px-3 py-1.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
-                            <button type="submit" class="bg-purple-600 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-purple-700 whitespace-nowrap">
+                                   class="w-20 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm text-center font-semibold text-slate-700 outline-none transition-all focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20">
+                            <button type="submit"
+                                    class="whitespace-nowrap rounded-xl bg-purple-600 px-3.5 py-1.5 text-xs font-bold text-white transition-colors hover:bg-purple-700 active:scale-95">
                                 Simpan
                             </button>
                         </form>
@@ -69,7 +107,20 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="5" class="px-6 py-10 text-center text-sm text-gray-400">Belum ada produk.</td>
+                    <td colspan="5" class="py-14 text-center">
+                        <div class="flex flex-col items-center gap-3">
+                            <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100">
+                                <svg class="h-6 w-6 text-slate-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                                </svg>
+                            </div>
+                            <p class="text-sm font-semibold text-slate-500">Belum ada produk</p>
+                            <a href="{{ route('merchant.products.create') }}"
+                               class="text-xs font-semibold text-purple-600 hover:underline">
+                                Tambah produk pertama →
+                            </a>
+                        </div>
+                    </td>
                 </tr>
                 @endforelse
             </tbody>
@@ -77,5 +128,10 @@
     </div>
 </div>
 
-<div class="mt-4">{{ $products->links() }}</div>
+@if($products->hasPages())
+<div class="mt-6 flex justify-center border-t border-slate-100 pt-6">
+    {{ $products->withQueryString()->links() }}
+</div>
+@endif
+
 @endsection

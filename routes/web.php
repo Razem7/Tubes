@@ -12,6 +12,22 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/storage/{path}', function (string $path) {
+    $file = storage_path('app/public/' . $path);
+
+    abort_unless(file_exists($file), 404);
+
+    return response()->file($file);
+})->where('path', '.*');
+
+Route::get('/public/storage/{path}', function (string $path) {
+    $file = storage_path('app/public/' . $path);
+
+    abort_unless(file_exists($file), 404);
+
+    return response()->file($file);
+})->where('path', '.*');
+
 // Redirect root to products
 Route::get('/', fn() => redirect()->route('products.index'));
 

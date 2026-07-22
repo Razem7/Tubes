@@ -20,6 +20,10 @@ trait HasPhotoUrl
             return '/' . $normalizedPath;
         }
 
+        if (str_starts_with($normalizedPath, 'public/')) {
+            return '/storage/' . substr($normalizedPath, strlen('public/'));
+        }
+
         return '/storage/' . $normalizedPath;
     }
 }

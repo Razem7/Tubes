@@ -1,89 +1,153 @@
 @extends('layouts.app')
-
-@section('title', 'Status Pendaftaran Merchant - GadgetHub')
+@section('title', 'Status Pendaftaran Merchant — GadgetHub')
 
 @section('content')
-<div class="max-w-lg mx-auto px-4 py-16 text-center">
+<div class="page-container py-16">
+<div class="mx-auto max-w-lg">
 
-    @if(!$application)
-        {{-- Belum pernah daftar --}}
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-10">
-            <div class="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"/><path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd"/></svg>
-            </div>
-            <h2 class="text-xl font-bold text-gray-800 mb-2">Belum Ada Pendaftaran</h2>
-            <p class="text-gray-500 text-sm mb-6">Kamu belum pernah mengajukan pendaftaran merchant.</p>
-            <a href="{{ route('merchant.apply.create') }}"
-               class="inline-block bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold px-6 py-3 rounded-xl transition">
-                Daftar Sekarang
-            </a>
-        </div>
+@if(!$application)
+{{-- ── Belum pernah daftar ── --}}
+<div class="card p-10 text-center">
+    <div class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-100">
+        <svg class="h-8 w-8 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"/>
+            <path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd"/>
+        </svg>
+    </div>
+    <span class="badge badge-slate mb-3">Belum Terdaftar</span>
+    <h2 class="text-xl font-extrabold text-slate-900">Belum Ada Pendaftaran</h2>
+    <p class="mt-2 text-sm text-slate-500 leading-relaxed">
+        Kamu belum pernah mengajukan pendaftaran merchant. Daftar sekarang dan mulai berjualan di GadgetHub!
+    </p>
+    <div class="mt-6 flex flex-col items-center gap-3">
+        <a href="{{ route('merchant.apply.create') }}" class="btn-merchant w-full py-3.5 text-sm font-bold">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+            </svg>
+            Daftar Merchant Sekarang
+        </a>
+        <a href="{{ route('products.index') }}" class="text-sm text-slate-400 hover:text-slate-600 transition-colors">
+            Kembali ke marketplace
+        </a>
+    </div>
+</div>
 
-    @elseif($application->isPending())
-        {{-- Menunggu review --}}
-        <div class="bg-white rounded-2xl shadow-sm border border-yellow-200 p-10">
-            <div class="w-16 h-16 bg-yellow-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>
-            </div>
-            <span class="inline-block bg-yellow-100 text-yellow-700 text-xs font-bold px-3 py-1 rounded-full mb-3">Menunggu Review</span>
-            <h2 class="text-xl font-bold text-gray-800 mb-2">Pendaftaran Sedang Diproses</h2>
-            <p class="text-gray-500 text-sm mb-4">Pendaftaran untuk toko <strong>{{ $application->store_name }}</strong> sedang direview oleh tim GadgetHub.</p>
-            <p class="text-xs text-gray-400">Dikirim {{ $application->created_at->diffForHumans() }} &middot; Proses 1–3 hari kerja</p>
+@elseif($application->isPending())
+{{-- ── Menunggu review ── --}}
+<div class="card overflow-hidden p-0 text-center">
+    <div class="bg-amber-50 px-10 pt-10 pb-8">
+        <div class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-3xl bg-amber-100">
+            <svg class="h-8 w-8 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
         </div>
+        <span class="badge bg-amber-100 text-amber-700 border-amber-200 mb-3">Menunggu Review</span>
+        <h2 class="text-xl font-extrabold text-slate-900">Pendaftaran Sedang Diproses</h2>
+    </div>
+    <div class="px-10 pb-10 pt-6">
+        <p class="text-sm text-slate-600 leading-relaxed">
+            Pendaftaran untuk toko <strong class="text-slate-800">{{ $application->store_name }}</strong>
+            sedang direview oleh tim GadgetHub.
+        </p>
+        <div class="mt-5 flex items-center justify-center gap-2 rounded-2xl border border-amber-100 bg-amber-50 px-4 py-3 text-xs text-amber-700">
+            <svg class="h-4 w-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            Dikirim {{ $application->created_at->diffForHumans() }} · Proses 1–3 hari kerja
+        </div>
+        <a href="{{ route('products.index') }}" class="btn-secondary mt-5 w-full py-3 text-sm">
+            Kembali ke Marketplace
+        </a>
+    </div>
+</div>
 
-    @elseif($application->isApproved())
-        @if(auth()->user()->isMerchant())
-        {{-- Approved dan masih aktif merchant --}}
-        <div class="bg-white rounded-2xl shadow-sm border border-green-200 p-10">
-            <div class="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+@elseif($application->isApproved())
+    @if(auth()->user()->isMerchant())
+    {{-- ── Approved & aktif ── --}}
+    <div class="card overflow-hidden p-0 text-center">
+        <div class="bg-emerald-50 px-10 pt-10 pb-8">
+            <div class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-3xl bg-emerald-100">
+                <svg class="h-8 w-8 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
             </div>
-            <span class="inline-block bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full mb-3">Disetujui</span>
-            <h2 class="text-xl font-bold text-gray-800 mb-2">Selamat! Kamu Sudah Jadi Merchant 🎉</h2>
-            <p class="text-gray-500 text-sm mb-6">Toko <strong>{{ $application->store_name }}</strong> telah disetujui. Mulai upload produkmu sekarang!</p>
-            <a href="{{ route('merchant.dashboard') }}"
-               class="inline-block bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold px-6 py-3 rounded-xl transition">
-                Masuk ke Dashboard Merchant
-            </a>
+            <span class="badge badge-emerald mb-3">Disetujui</span>
+            <h2 class="text-xl font-extrabold text-slate-900">Selamat! Kamu Sudah Jadi Merchant 🎉</h2>
         </div>
-        @else
-        {{-- Pernah approved tapi sudah di-demote admin ke user biasa --}}
-        <div class="bg-white rounded-2xl shadow-sm border border-orange-200 p-10">
-            <div class="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8 text-orange-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+        <div class="px-10 pb-10 pt-6">
+            <p class="text-sm text-slate-600 leading-relaxed">
+                Toko <strong class="text-slate-800">{{ $application->store_name }}</strong> telah disetujui.
+                Mulai upload produkmu sekarang dan raih pelanggan pertamamu!
+            </p>
+            <div class="mt-5 flex flex-col gap-3">
+                <a href="{{ route('merchant.dashboard') }}" class="btn-merchant w-full py-3.5 text-sm font-bold">
+                    Masuk ke Dashboard Merchant
+                </a>
+                <a href="{{ route('merchant.products.create') }}" class="btn-secondary w-full py-3 text-sm">
+                    Tambah Produk Pertama
+                </a>
             </div>
-            <span class="inline-block bg-orange-100 text-orange-700 text-xs font-bold px-3 py-1 rounded-full mb-3">Akun Diubah</span>
-            <h2 class="text-xl font-bold text-gray-800 mb-2">Status Merchant Dicabut</h2>
-            <p class="text-gray-500 text-sm mb-2">Akun kamu telah diubah kembali menjadi <strong>User Biasa</strong> oleh Admin.</p>
-            <p class="text-gray-500 text-sm mb-6">Kamu bisa mengajukan pendaftaran merchant ulang kapan saja.</p>
-            <a href="{{ route('merchant.apply.create') }}"
-               class="inline-block bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold px-6 py-3 rounded-xl transition">
+        </div>
+    </div>
+
+    @else
+    {{-- ── Approved tapi sudah di-demote ── --}}
+    <div class="card overflow-hidden p-0 text-center">
+        <div class="bg-orange-50 px-10 pt-10 pb-8">
+            <div class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-3xl bg-orange-100">
+                <svg class="h-8 w-8 text-orange-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+            </div>
+            <span class="badge bg-orange-100 text-orange-700 border-orange-200 mb-3">Akun Diubah</span>
+            <h2 class="text-xl font-extrabold text-slate-900">Status Merchant Dicabut</h2>
+        </div>
+        <div class="px-10 pb-10 pt-6">
+            <p class="text-sm text-slate-600 leading-relaxed">
+                Akun kamu telah diubah kembali menjadi <strong class="text-slate-800">User Biasa</strong> oleh Admin.
+                Kamu bisa mengajukan pendaftaran merchant ulang kapan saja.
+            </p>
+            <a href="{{ route('merchant.apply.create') }}" class="btn-merchant mt-5 w-full py-3.5 text-sm font-bold">
                 Daftar Merchant Lagi
             </a>
         </div>
-        @endif
-
-    @else
-        {{-- Rejected --}}
-        <div class="bg-white rounded-2xl shadow-sm border border-red-200 p-10">
-            <div class="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>
-            </div>
-            <span class="inline-block bg-red-100 text-red-600 text-xs font-bold px-3 py-1 rounded-full mb-3">Ditolak</span>
-            <h2 class="text-xl font-bold text-gray-800 mb-2">Pendaftaran Ditolak</h2>
-            @if($application->rejection_reason)
-            <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-5 text-left">
-                <p class="text-xs font-semibold text-red-600 mb-1">Alasan Penolakan:</p>
-                <p class="text-sm text-red-700">{{ $application->rejection_reason }}</p>
-            </div>
-            @endif
-            <p class="text-gray-500 text-sm mb-6">Kamu bisa mengajukan pendaftaran ulang setelah memperbaiki data.</p>
-            <a href="{{ route('merchant.apply.create') }}"
-               class="inline-block bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold px-6 py-3 rounded-xl transition">
-                Daftar Ulang
-            </a>
-        </div>
+    </div>
     @endif
 
+@else
+{{-- ── Rejected ── --}}
+<div class="card overflow-hidden p-0 text-center">
+    <div class="bg-rose-50 px-10 pt-10 pb-8">
+        <div class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-3xl bg-rose-100">
+            <svg class="h-8 w-8 text-rose-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+        </div>
+        <span class="badge badge-rose mb-3">Ditolak</span>
+        <h2 class="text-xl font-extrabold text-slate-900">Pendaftaran Ditolak</h2>
+    </div>
+    <div class="px-10 pb-10 pt-6">
+        @if($application->rejection_reason)
+        <div class="mb-5 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-left">
+            <p class="mb-1 text-xs font-extrabold uppercase tracking-wider text-rose-500">Alasan Penolakan</p>
+            <p class="text-sm leading-relaxed text-rose-800">{{ $application->rejection_reason }}</p>
+        </div>
+        @endif
+        <p class="text-sm text-slate-600 leading-relaxed">
+            Kamu bisa mengajukan pendaftaran ulang setelah memperbaiki data yang diperlukan.
+        </p>
+        <div class="mt-5 flex flex-col gap-3">
+            <a href="{{ route('merchant.apply.create') }}" class="btn-merchant w-full py-3.5 text-sm font-bold">
+                Daftar Ulang
+            </a>
+            <a href="{{ route('products.index') }}" class="btn-secondary w-full py-3 text-sm">
+                Kembali ke Marketplace
+            </a>
+        </div>
+    </div>
+</div>
+@endif
+
+</div>
 </div>
 @endsection
