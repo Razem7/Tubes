@@ -149,43 +149,53 @@ class DashboardController extends Controller
         $this->authorize('update', $product);
 
         $validated = $request->validate([
-            'title' => 'required|string|min:5|max:100',
-            'description' => 'required|string|min:10|max:2000',
-            'price' => 'required|numeric|min:1|integer',
-            'stock' => 'required|integer|min:0',
-            'category_id' => 'required|exists:categories,id',
-            'condition' => 'required|in:new,like_new,good,fair',
-            'location' => 'required|string|max:255',
-            'brand' => 'nullable|string|max:50',
-            'model' => 'nullable|string|max:100',
-            'photos' => 'nullable|array|max:5',
-            'photos.*' => 'image|mimes:jpg,jpeg,png,webp|max:2048',
+            'title'        => 'required|string|min:5|max:100',
+            'description'  => 'required|string|min:10|max:2000',
+            'price'        => 'required|numeric|min:1|integer',
+            'stock'        => 'required|integer|min:0',
+            'category_id'  => 'required|exists:categories,id',
+            'condition'    => 'required|in:new,like_new,good,fair',
+            'location'     => 'required|string|max:255',
+            'brand'        => 'nullable|string|max:50',
+            'model'        => 'nullable|string|max:100',
+            'delete_photos'=> 'nullable|array',
+            'delete_photos.*' => 'integer',
+            'new_photos'   => 'nullable|array|max:5',
+            'new_photos.*' => 'image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
         $product->update([
-            'title' => $validated['title'],
-            'description' => $validated['description'],
-            'price' => $validated['price'],
-            'stock' => $validated['stock'],
-            'category_id' => $validated['category_id'],
-            'condition' => $validated['condition'],
-            'location' => $validated['location'],
-            'brand' => $validated['brand'] ?? null,
-            'model' => $validated['model'] ?? null,
+            'title'           => $validated['title'],
+            'description'     => $validated['description'],
+            'price'           => $validated['price'],
+            'stock'           => $validated['stock'],
+            'category_id'     => $validated['category_id'],
+            'condition'       => $validated['condition'],
+            'location'        => $validated['location'],
+            'brand'           => $validated['brand'] ?? null,
+            'model'           => $validated['model'] ?? null,
             'payment_methods' => 'cod',
         ]);
 
-        if ($request->hasFile('photos')) {
-            foreach ($product->photos as $old) {
-                Storage::disk('public')->delete($old->getRawOriginal('photo_url'));
-                $old->delete();
-            }
+        // Delete photos that were checked for removal
+        if ($request->filled('delete_photos')) {
+            $photosToDelete = ProductPhoto::whereIn('id', $request->delete_photos)
+                ->where('product_id', $product->id)
+                ->get();
 
-            foreach ($request->file('photos') as $photo) {
+            foreach ($photosToDelete as $photo) {
+                Storage::disk('public')->delete($photo->getRawOriginal('photo_url'));
+                $photo->delete();
+            }
+        }
+
+        // Upload new photos
+        if ($request->hasFile('new_photos')) {
+            foreach ($request->file('new_photos') as $photo) {
                 $path = $photo->store('products', 'public');
                 ProductPhoto::create([
                     'product_id' => $product->id,
-                    'photo_url' => $path,
+                    'photo_url'  => $path,
                 ]);
             }
         }
